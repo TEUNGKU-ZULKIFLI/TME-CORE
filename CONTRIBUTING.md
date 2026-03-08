@@ -1,54 +1,64 @@
-# Panduan Kontribusi TME-CORE
+k# Panduan Kontribusi TME-CORE
 
-Terima kasih telah berkontribusi pada **TME-CORE (Traffic Mitigation External Core)**. Dokumen ini bertujuan untuk menjaga kerapian repository agar setiap perubahan terdokumentasi secara profesional, konsisten, dan memiliki jejak audit yang jelas (*audit trail*).
+Terima kasih telah berkontribusi pada **TME-CORE (Traffic Mitigation External Core)**. Dokumen ini memastikan setiap perubahan terdokumentasi secara profesional melalui *Semantic Commits*.
 
 ---
 
-## 🚀 Standar Pesan Commit (Semantic Commits)
+## 🏗️ Format Pesan Commit
 
-Kita menggunakan format **Conventional Commits** untuk memastikan sejarah (*history*) proyek tetap bersih dan mudah dibaca oleh pengembang lain.
+Gunakan formula berikut untuk menjaga riwayat proyek tetap bersih:
 
-```bash
-<type>(<scope>): <emoji> <deskripsi singkat dalam Bahasa Indonesia> [ref #N | close #N]
-```
+` <type>(<scope>): <emoji> <subject> `
+
+Untuk memberikan detail lebih lanjut, gunakan beberapa flag `-m` di terminal:
+` git commit -m "Header (Ringkasan)" -m "Body (Detail perubahan)" -m "Footer (Referensi Issue)" `
 
 ### 1. Daftar Type Commit
 | Type | Emoji | Kegunaan |
 | :--- | :---: | :--- |
-| **feat** | ✨ | Penambahan fitur baru (misal: logika mitigasi cerdas) |
-| **fix** | 🐛 | Perbaikan bug atau kesalahan logika pada sistem |
-| **docs** | 📚 | Perubahan pada dokumentasi (README, komentar kode, manual) |
-| **style** | 🎨 | Perapian kode (formatting, PEP 8) tanpa mengubah logika |
-| **refactor** | ♻️ | Restrukturisasi kode agar lebih modular dan efisien |
-| **test** | ✅ | Penambahan skenario uji atau validasi fungsi sistem |
-| **chore** | 🔧 | Tugas rutin (update library, .gitignore, konfigurasi env) |
+| **feat** | ✨ | Fitur baru (logika mitigasi, modul baru) |
+| **fix** | 🐛 | Perbaikan bug atau kesalahan logika |
+| **docs** | 📝 | Dokumentasi (README, komentar kode, manual) |
+| **style** | 🎨 | Perapian kode (formatting, PEP 8) tanpa ubah logika |
+| **refactor** | ♻️ | Restrukturisasi kode agar lebih efisien |
+| **test** | ✅ | Penambahan skenario uji atau validasi |
+| **chore** | 🔧 | Tugas rutin (update library, config, .gitignore) |
 
-### 2. Daftar Scope Berbasis NDLC
-Gunakan *scope* ini untuk memperjelas fase pengembangan mana yang sedang dikerjakan sesuai metodologi sistem:
-
-- **analysis**: Identifikasi pola log serangan, penetapan threshold, dan definisi metrik performa.
-- **design**: Perancangan arsitektur engine (IPO), diagram topologi, dan alur logika flowchart.
-- **simulation**: Persiapan lingkungan virtual (test-bed), instalasi CHR, dan pengujian koneksi API dasar.
-- **implementation**: Proses pengodean utama Python, integrasi API MikroTik, dan Bot Telegram.
-- **monitoring**: Simulasi serangan aktif (A/B Testing) dan pengambilan data metrik real-time.
-- **management**: Evaluasi data hasil pengujian, pengolahan laporan teknis, dan optimasi sistem.
-
----
-
-## 🛠️ Alur Kerja (Workflow)
-
-1. **Sinkronisasi**: Selalu lakukan `git pull origin main` sebelum mulai bekerja untuk menghindari konflik kode.
-2. **Issue Tracking**: Pilih salah satu Sub-Issue pada GitHub (misal #2 untuk fase Analysis) yang akan dikerjakan.
-3. **Commit**: Gunakan pesan commit yang semantik.
-   - Contoh: `feat(implementation): ✨ tambah modul ekstraksi log via api port 8728 ref #4`
-   - Contoh: `docs(design): 📚 perbarui diagram topologi jaringan pada readme close #3`
-4. **Push**: Kirim perubahan kamu ke repository pusat dengan `git push origin main`.
+### 2. Daftar Scope (Fase NDLC)
+Gunakan *scope* untuk memperjelas fase pengembangan:
+- **analysis**: Identifikasi pola log, threshold, dan metrik.
+- **design**: Arsitektur engine, diagram topologi, dan flowchart.
+- **simulation**: Lingkungan virtual, instalasi CHR, API dasar.
+- **implementation**: Pengodean Python, integrasi MikroTik & Telegram.
+- **monitoring**: Pengujian serangan (A/B Testing) & data real-time.
+- **management**: Evaluasi hasil, laporan teknis, dan optimasi.
 
 ---
 
-## 📝 Catatan Penting
-- **Standar Kode**: Pastikan kode Python mengikuti standar PEP 8 (indentasi 4 spasi).
-- **Keamanan**: **Dilarang keras** melakukan commit pada file `.env` yang berisi kredensial nyata. Selalu gunakan file `.env.example` sebagai referensi konfigurasi.
-- **Metrik**: Pastikan setiap perubahan pada *logic* tetap mengacu pada target efisiensi MTTR < 5 detik.
+## 💡 Contoh Commit dengan Detail (Multi-line)
 
-Terima kasih telah menjaga profesionalitas pengembangan TME-CORE!
+Jika ingin menjelaskan perubahan secara mendalam, gunakan format ini:
+
+```bash
+git commit -m "feat(implementation): ✨ tambah modul ekstraksi log via api" \
+           -m "Menambahkan fungsi parsing log MikroTik menggunakan port 8728 untuk mempercepat deteksi." \
+           -m "Closes #4"
+```
+
+---
+
+## ⚠️ Catatan Penting
+- **Imperative Mood**: Gunakan kata kerja perintah (contoh: `tambah`, bukan `menambahkan`).
+- **Karakter**: Baris pertama (header) maksimal 70-100 karakter.
+- **Keamanan**: Jangan pernah mengunggah file `.env` yang berisi kredensial [Sumber: Prosedur Keamanan].
+
+---
+
+### Tips (Pemula)
+Karena penggunaan banyak `-m`, ingatlah aturan emas ini:
+1.  **`-m` Pertama**: Adalah **Header** (Wajib ada). Isinya: `type(scope): emoji deskripsi singkat`.
+2.  **`-m` Kedua**: Adalah **Body**. Di sini bisa bercerita *kenapa* perubahan itu dilakukan.
+3.  **`-m` Ketiga**: Adalah **Footer**. Digunakan untuk menutup issue, contoh: `Closes #7` atau `ref #7`.
+
+Terima kasih telah menjaga standar profesionalitas TME-CORE!
+
