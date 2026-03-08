@@ -1,4 +1,4 @@
-k# Panduan Kontribusi TME-CORE
+# Panduan Kontribusi TME-CORE
 
 Terima kasih telah berkontribusi pada **TME-CORE (Traffic Mitigation External Core)**. Dokumen ini memastikan setiap perubahan terdokumentasi secara profesional melalui *Semantic Commits*.
 
