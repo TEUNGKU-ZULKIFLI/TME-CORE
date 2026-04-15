@@ -1,0 +1,2 @@
+RouterOS-api==0.21.0
+python-dotenv
