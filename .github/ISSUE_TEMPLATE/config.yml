@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: NDLC Planning Guide
+    url: https://github.com/TEUNGKU-ZULKIFLI/TME-CORE/blob/main/PLANNING.md
+    about: Lihat peta fase NDLC sebelum membuat issue baru.

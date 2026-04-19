@@ -1,0 +1,2 @@
+scenario_id,run_id,timestamp,source_ip,protocol,failed_count,cpu_percent,latency_ms,packet_loss_percent,throughput_mbps,detection_flag,block_flag,mttr_ms,alert_latency_ms
+BASELINE,RUN-001,2026-04-20T08:00:00+07:00,192.168.88.10,NONE,0,12.5,2.1,0.0,85.0,0,0,0,0
