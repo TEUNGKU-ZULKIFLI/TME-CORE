@@ -1,0 +1,42 @@
+app:
+  name: TME-CORE
+  version: 1.0.0
+  description: "MikroTik Threat Mitigation Engine"
+  environment: development
+
+mikrotik:
+  host: 192.168.10.1
+  username: admin
+  password: 085213
+  port: 8728
+  timeout: 10
+  address_list_name: brute_force_block
+
+logging:
+  log_file: /var/log/auth.log
+  ftp_log: /var/log/vsftpd.log
+  app_log: data/logs/tme_core.log
+  level: INFO
+
+detection:
+  brute_force:
+    threshold: 10              # >= 10 failed attempts
+    window_seconds: 60         # dalam 60 seconds
+  
+  anomaly:
+    cpu_spike_threshold: 30    # % above baseline
+    window_seconds: 60
+    suspicious_score_threshold: 0.7
+
+mitigasi:
+  max_response_time_ms: 5000   # Target < 5 seconds
+  auto_unblock_minutes: 60     # Auto unblock setelah 60 menit
+
+telegram:
+  enabled: true
+  bot_token: ${TELEGRAM_BOT_TOKEN}
+  chat_id: ${TELEGRAM_CHAT_ID}
+
+database:
+  path: data/db/tme_core.db
+  enable_metrics: true
