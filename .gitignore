@@ -1,12 +1,18 @@
-# ===== Environment & Credentials (CRITICAL!) =====
-.env
-.env.local
-.env.*.local
-
-# ===== Python (Virtual Environment & Cache) =====
+# Environment
 venv/
+.venv/
 env/
-ENV/
+*.env
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -24,84 +30,26 @@ parts/
 sdist/
 var/
 wheels/
-pip-wheel-metadata/
-share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# ===== Python Testing & Coverage =====
+# Testing
 .pytest_cache/
 .coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
 htmlcov/
+.tox/
 
-# ===== IDE & Editor Files =====
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-*.sublime-workspace
-*.sublime-project
-.vim/
+# Data
+data/logs/*.log
+data/db/*.db
+data/metrics/*.csv
+data/metrics/*.json
 
-# ===== OS-Specific Files =====
+# OS
 .DS_Store
 Thumbs.db
-*.lnk
-.directory
 
-# ===== Project-Specific =====
-logs/
-*.log
-*.tsv
-*.db
-*.sqlite
-*.sqlite3
-
-# ===== Lab Data Policy =====
-# Raw data can be sensitive/large; keep local by default.
-data/raw/*
-!data/raw/.gitkeep
-
-# Allow templates and curated processed datasets to be versioned.
-!data/templates/
-!data/templates/*.csv
-!data/processed/
-!data/processed/.gitkeep
-!data/processed/*.csv
-
-# ===== Temporary Files =====
-*.tmp
+# Legacy
+legacy/
 *.bak
-temp/
-tmp/
-
-# ===== Application State =====
-.state
-.cache
-runtime/
-
-# ===== Documentation Generated =====
-docs/_build/
-site/
-
-# ===== Security & Credentials =====
-*.pem
-*.key
-*.cert
-*.crt
-secrets.txt
-
-# ===== Node (if using any frontend tools) =====
-node_modules/
-npm-debug.log
-yarn-error.log
-
-# ===== Backup Files =====
-*.backup
-*.bak
-*~
