@@ -15,10 +15,14 @@ class TMECore:
         config = get_config()
         self.config = config
         
-        # Initialize modules
         logger.info("Initializing TME-CORE modules...")
+        
+        # Get log file path dari config
+        log_file_ssh = config.get('detection', {}).get('log_file_ssh', 'data/logs/514MikroTik.log')
+        
+        # Initialize modules
         self.api = MikroTikClient(**config['mikrotik'])
-        self.parser = LogParser(config['log_file_ssh'])
+        self.parser = LogParser(log_file_ssh)  # ✅ USE FROM CONFIG
         self.detector = BruteForceDetector(
             threshold=config['detection']['brute_force']['threshold'],
             window_seconds=config['detection']['brute_force']['window_seconds']
@@ -26,6 +30,8 @@ class TMECore:
         
         self.blocked_ips = set()
         self.metrics = []
+        
+        logger.info("✅ All modules initialized")
     
     def start(self):
         """Start engine daemon"""
