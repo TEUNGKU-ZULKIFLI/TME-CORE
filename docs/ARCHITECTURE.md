@@ -3,10 +3,10 @@
 ## 1. Topologi Lab Virtual
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        NETWORK LAB ISOLATION                    │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
+┌────────────────────────────────────────────────────────────────┐
+│                        NETWORK LAB ISOLATION                   │
+├────────────────────────────────────────────────────────────────┤
+│                                                                │
 │  ┌──────────────────┐    ┌──────────────────┐                  │
 │  │  KALI LINUX      │    │  DEBIAN SERVER   │                  │
 │  │  (Attacker)      │◄──►│  (TME-CORE)      │                  │
@@ -16,10 +16,10 @@
 │  │   Tools          │    │ • Log Parser     │                  │
 │  │                  │    │ • Detectors      │                  │
 │  └────────┬─────────┘    └─────────┬────────┘                  │
-│           │                        │                            │
+│           │                        │                           │
 │           │ Attack (SSH/FTP)       │ API (port 8728)           │
-│           │ (port 21, 22)          │                            │
-│           │                        │                            │
+│           │ (port 21, 22)          │                           │
+│           │                        │                           │
 │  ┌────────▼────────────────────────▼────────┐                  │
 │  │     MIKROTIK ROUTEROS 6.49.19 (TARGET)   │                  │
 │  │     hEX Board (RB750Gr2)                 │                  │
@@ -27,19 +27,19 @@
 │  │                                          │                  │
 │  │  Interfaces:                             │                  │
 │  │  ├─ ether1-ISP (Internet gateway)        │                  │
-│  │  ├─ ether2 (192.168.10.1) ◄─ Debian     │                  │
-│  │  ├─ ether3-5 (unused)                   │                  │
+│  │  ├─ ether2 (192.168.10.1) ◄─ Debian      │                  │
+│  │  ├─ ether3-5 (unused)                    │                  │
 │  │                                          │                  │
 │  │  Services:                               │                  │
-│  │  ├─ SSH (port 22) ◄─ Kali brute force   │                  │
-│  │  ├─ FTP (port 21) ◄─ Kali brute force   │                  │
-│  │  ├─ API (port 8728) ◄─ Debian engine    │                  │
-│  │  ├─ Firewall rules (address-list)       │                  │
-│  │  └─ System resource (CPU/memory)        │                  │
+│  │  ├─ SSH (port 22) ◄─ Kali brute force    │                  │
+│  │  ├─ FTP (port 21) ◄─ Kali brute force    │                  │
+│  │  ├─ API (port 8728) ◄─ Debian engine     │                  │
+│  │  ├─ Firewall rules (address-list)        │                  │
+│  │  └─ System resource (CPU/memory)         │                  │
 │  │                                          │                  │
 │  └──────────────────────────────────────────┘                  │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
 
 NETWORK DIAGRAM:
 
@@ -155,47 +155,47 @@ User (Admin)
 └─────────────────────────────┘        │
                                        │
                               ┌────────┴──────────┐
-                              │ Alert System     │
-                              │ telegram_alerter │
+                              │ Alert System      │
+                              │ telegram_alerter  │
                               └────────┬──────────┘
                                        │
                               ┌────────▼──────────┐
-                              │ Firewall Manager │
-                              │ - block_ip()     │
-                              │ - metrics        │
+                              │ Firewall Manager  │
+                              │ - block_ip()      │
+                              │ - metrics         │
                               └────────┬──────────┘
                                        │
                               ┌────────▼──────────┐
-                              │ Detection Engine │
-                              │ ├─ Jalur A (BF) │
-                              │ └─ Jalur B (CPU)│
+                              │ Detection Engine  │
+                              │ ├─ Jalur A (BF)   │
+                              │ └─ Jalur B (CPU)  │
                               └────────┬──────────┘
                                        │
                               ┌────────▼──────────┐
-                              │ Log Parser       │
-                              │ stream events    │
+                              │ Log Parser        │
+                              │ stream events     │
                               └────────┬──────────┘
                                        │
-                    ┌──────────────────┴──────────────────┐
-                    │                                     │
+                    ┌──────────────────┴─────────────────┐
+                    │                                    │
         ┌───────────▼────────┐            ┌──────────────▼────────┐
-        │ /var/log/auth.log  │            │ /var/log/vsftpd.log  │
-        │ (SSH)              │            │ (FTP)                │
-        └────────────────────┘            └─────────────────────┘
-                    ▲                                      ▲
-                    │                                      │
+        │ /var/log/auth.log  │            │ /var/log/vsftpd.log   │
+        │ (SSH)              │            │ (FTP)                 │
+        └────────────────────┘            └───────────────────────┘
+                    ▲                                    ▲
+                    │                                    │
         ┌───────────┴────────┐            ┌──────────────┴────────┐
-        │ MikroTik SSH       │            │ MikroTik FTP        │
-        │ Failed Login       │            │ Failed Login        │
-        └────────────────────┘            └─────────────────────┘
+        │ MikroTik SSH       │            │ MikroTik FTP          │
+        │ Failed Login       │            │ Failed Login          │
+        └────────────────────┘            └───────────────────────┘
                     ▲                                      ▲
                     │                                      │
-        ┌───────────┴────────────────────────────────────┴────────┐
-        │                                                          │
+        ┌───────────┴──────────────────────────────────────┴──────┐
+        │                                                         │
         │           Kali Linux (Hydra/Medusa Attack)              │
         │           Brute Force Attempts                          │
-        │                                                          │
-        └──────────────────────────────────────────────────────────┘
+        │                                                         │
+        └─────────────────────────────────────────────────────────┘
 ```
 
 ## 5. Deteksi vs Mitigasi: 2 Jalur Paralel

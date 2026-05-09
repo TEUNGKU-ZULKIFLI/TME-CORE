@@ -18,12 +18,12 @@
 2. **MikroTik RouterOS 6.49.19** (Real Hardware atau VM)
    - RAM: 256MB minimal
    - Storage: On-board (hEX = 16MB)
-   - Network: ≥2 interfaces
+   - Network: ≥3 interfaces
 
 3. **KALI LINUX (Attacker)**
    - RAM: 2GB
    - Storage: 15GB
-   - Network: Bridge to MikroTik network
+   - Network: 2 NICs (Host-only + Bridge/Direct)
 
 ---
 
@@ -31,20 +31,25 @@
 
 ### 1.1 - Verifikasi Status RouterOS
 
+> [!WARNING]
+> SSH ke MikroTik Jika dengan PowerShell:
 ```bash
-# SSH ke MikroTik:
-ssh admin@192.168.10.1
-# Password: <your-password>
-
-# Cek versi:
-[admin@MikroTik] > system/resource/print
+ssh -o MACs=hmac-sha1 admin@192.168.10.1
+```
+> Cek versi:
+```bash
+[admin@MikroTik] > system resource print
                    version: 6.49.19
+```
+> Cek interfaces:
+```bash
+[admin@MikroTik] > interface print
+```
 
-# Cek interfaces:
-[admin@MikroTik] > interface/print
-
-# Cek services (pastikan SSH, FTP, API aktif):
-[admin@MikroTik] > ip/service/print
+> [!WARNING]
+>  Cek services (pastikan SSH, FTP, API aktif):
+```bash
+[admin@MikroTik] > ip service print
 Flags: X - disabled
  #   NAME       PORT
  0   telnet      23
@@ -57,32 +62,39 @@ Flags: X - disabled
 
 ### 1.2 - Setup Address-List untuk Blocking
 
+> [!TIP]
+> Buat address-list untuk brute_force_block (jika belum ada):
 ```bash
-# Buat address-list untuk brute_force_block (jika belum ada):
-[admin@MikroTik] > ip/firewall/address-list/add address=0.0.0.0/32 list=brute_force_block comment="Placeholder - auto-populated by TME-CORE"
-
-# Verify:
-[admin@MikroTik] > ip/firewall/address-list/print
- #   ADDRESS          LIST                COMMENT
- 0   0.0.0.0/32       brute_force_block   Placeholder...
+[admin@MikroTik] > ip firewall address-list add address=0.0.0.0/32 list=brute_force_block comment="Placeholder - auto-populated by TME-CORE"
 ```
+> Verify:
+```bash
+[admin@MikroTik] > ip firewall address-list print
+```
+> *Expected:*
+> > #ADDRESS          LIST                COMMENT
+> 0   0.0.0.0/32       brute_force_block   Placeholder...
 
 ### 1.3 - Setup Firewall Filter untuk Blocking
 
+> [!TIP]
+> Buat rule: DROP traffic dari brute_force_block list
 ```bash
-# Buat rule: DROP traffic dari brute_force_block list
-[admin@MikroTik] > ip/firewall/filter/add chain=input src-address-list=brute_force_block action=drop comment="Drop brute_force_block - TME-CORE"
-
-# Verify:
-[admin@MikroTik] > ip/firewall/filter/print
- #  CHAIN   SRC-ADDR-LIST        ACTION
- 0  input   brute_force_block    drop
+[admin@MikroTik] > ip firewall filter add chain=input src-address-list=brute_force_block action=drop comment="Drop brute_force_block - TME-CORE"
 ```
+> Verify:
+```bash
+[admin@MikroTik] > ip firewall filter print
+```
+> *Expected:*
+> > \# CHAIN   SRC-ADDR-LIST        ACTION
+> 0  input   brute_force_block    drop
 
 ### 1.4 - Test API Connection
 
+> [!TIP]
+> Dari Debian, test API connection:
 ```bash
-# Dari Debian, test API connection:
 telnet 192.168.10.1 8728
 
 # Expected: Connected
@@ -98,14 +110,16 @@ python3 -c "from src.api.mikrotik_client import MikroTikClient; ..."
 
 ### 2.1 - Install Dependencies
 
+> Login ke Debian:
 ```bash
-# Login ke Debian:
 ssh teungku@192.168.12.1  # (NIC1: Host-only)
-
-# Update system:
+```
+> Update system:
+```bash
 sudo apt update && sudo apt upgrade -y
-
-# Install required packages:
+```
+> Install required packages:
+```bash
 sudo apt install -y \
   python3.11 \
   python3-pip \
@@ -121,43 +135,54 @@ sudo apt install -y \
 
 ```bash
 cd ~
+```
+```bash
 git clone https://github.com/TEUNGKU-ZULKIFLI/TME-CORE.git
+```
+```bash
 cd TME-CORE
-
-# Checkout branch refactor/ndlc-structure
-git checkout refactor/ndlc-structure
 ```
 
 ### 2.3 - Setup Python Virtual Environment
-
+> [!IMPORTANT]
+> Create venv
 ```bash
-# Create venv
 python3 -m venv venv
-
-# Activate
-source venv/bin/activate
-
-# Upgrade pip
-pip install --upgrade pip
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Verify installation
-pip list | grep routeros-api
-# Output: routeros-api          0.21.0
 ```
+> Activate
+```bash
+source venv/bin/activate
+```
+> Upgrade pip
+```bash
+pip install --upgrade pip
+```
+> Install dependencies
+```bash
+pip install -r requirements.txt
+```
+> Verify installation
+```bash
+pip list | grep routeros-api
+```
+> Atau Untuk Check package yang utamanya
+```bash
+pip install routeros-api
+```
+> Output: routeros-api          0.21.0
 
 ### 2.4 - Configure Environment
 
+> Copy .env template
 ```bash
-# Copy .env template
 cp config/.env.example config/.env
-
-# Edit .env dengan credentials MikroTik Anda:
+```
+> Edit .env dengan credentials MikroTik Anda:
+```bash
 nano config/.env
-
-# Content:
+```
+> Content:
+```bash
 MIKROTIK_HOST=192.168.10.1
 MIKROTIK_USERNAME=admin
 MIKROTIK_PASSWORD=<your-password>
@@ -180,16 +205,15 @@ LOG_LEVEL=INFO
 
 ### 2.5 - Test MikroTik Connectivity
 
+> Ping MikroTik (ether2-DEBIAN: 192.168.10.1)
 ```bash
-# Ping MikroTik (ether2: 192.168.10.1)
 ping 192.168.10.1 -c 4
-
-# Expected output:
-# PING 192.168.10.1 (192.168.10.1) 56(84) bytes of data.
-# 64 bytes from 192.168.10.1: icmp_seq=1 time=1.2 ms
-# ...
-# 0% packet loss
 ```
+> *Expected output:*
+> > PING 192.168.10.1 (192.168.10.1) 56(84) bytes of data.
+> 64 bytes from 192.168.10.1: icmp_seq=1 time=1.2 ms
+> ...
+> 0% packet loss
 
 ---
 
@@ -245,8 +269,9 @@ def main():
 if __name__ == "__main__":
     main()
 EOF
-
-# Make executable
+```
+> Make executable
+```bash
 chmod +x scripts/test_api_connection.py
 ```
 
@@ -254,53 +279,59 @@ chmod +x scripts/test_api_connection.py
 
 ```bash
 cd ~/TME-CORE
-source venv/bin/activate
-
-python3 scripts/test_api_connection.py
-
-# Expected output:
-# INFO:__main__:🔌 Connecting to MikroTik: 192.168.10.1...
-# INFO:__main__:✅ Connection successful!
-# INFO:__main__:📋 Fetching interfaces...
-# INFO:__main__:  - ether1-ISP: ether
-# INFO:__main__:  - ether2: ether
-# INFO:__main__:✅ All tests passed!
 ```
+```bash
+source venv/bin/activate
+```
+```bash
+python3 scripts/test_api_connection.py
+```
+> *Expected output:*
+> > INFO:__main__:🔌 Connecting to MikroTik: 192.168.10.1...
+> INFO:__main__:✅ Connection successful!
+> INFO:__main__:📋 Fetching interfaces...
+> INFO:__main__:  - ether1-ISP: ether
+> INFO:__main__:  - ether2: ether
+> INFO:__main__:✅ All tests passed!
 
 ---
 
 ## Step 4: Verify Log Files
 
 ### 4.1 - Check SSH Log
-
+> [!IMPORTANT]
+> SSH ke MikroTik dan trigger failed login:
 ```bash
-# SSH ke MikroTik dan trigger failed login:
-ssh admin@192.168.10.1
-# Enter wrong password 3x
-
-# Kemudian check log:
-telnet 192.168.10.1 22
-# Or use Kali with Hydra
-
-# Log should appear in:
-cat /var/log/auth.log | grep "Failed password"
-
-# Expected:
-# Apr 24 10:15:45 debian sshd[1234]: Failed password for admin from 192.168.1.50
+ssh -o MACs=hmac-sha1 admin@192.168.10.1
 ```
+> Enter wrong password 3x
+
+> Kemudian check log:
+```bash
+telnet 192.168.10.1 22
+```
+> [!IMPORTANT]
+> Or use Kali with Hydra
+
+> Log should appear in:
+```bash
+cat /var/log/auth.log | grep "Failed password"
+```
+> *Expected:*
+> > Apr 24 10:15:45 debian sshd[1234]: Failed password for admin from 192.168.1.50
 
 ### 4.2 - Check FTP Log
 
+> [!TIP]
+> Enable FTP logging (optional):
+> di MikroTik, aktifkan FTP service logging
+
+> Check log:
 ```bash
-# Enable FTP logging (optional):
-# di MikroTik, aktifkan FTP service logging
-
-# Check log:
 cat /var/log/vsftpd.log
-
-# Expected:
-# Wed Apr 24 10:15:50 2026 [pid 567] 192.168.1.50:12345] LOGIN FAILED. [admin]
 ```
+> *Expected:*
+> > Wed Apr 24 10:15:50 2026 [pid 567] 192.168.1.50:12345] LOGIN FAILED. [admin]
 
 ---
 
@@ -308,22 +339,27 @@ cat /var/log/vsftpd.log
 
 ### 5.1 - Install Hydra
 
+> [!CAUTION]
+> SSH ke Kali Linux
 ```bash
-# SSH ke Kali Linux
-ssh root@<kali-ip>
-
-# Install Hydra
+ssh root@192.168.254.1 # (NIC1: Host-only)
+```
+> Install Hydra
+```bash
 apt update
+```
+```bash
 apt install -y hydra
-
-# Verify
+```
+> Verify
+```bash
 hydra --version
 ```
 
 ### 5.2 - Prepare Attack
 
+> Create wordlist:
 ```bash
-# Create wordlist (atau download):
 cat > /tmp/wordlist.txt << 'EOF'
 password123
 admin123
@@ -331,9 +367,16 @@ admin123
 qwerty
 mypassword
 EOF
-
-# Test SSH brute force (later, untuk testing phase)
-hydra -l admin -P /tmp/wordlist.txt ssh://192.168.10.1
+```
+> [!IMPORTANT]
+> Atau download wordlist dengan wget:
+```bash
+wget https://archive.org/download/rockyou.txt/rockyou.txt -O /tmp/wordlist.txt
+```
+> [!CAUTION]
+> Test SSH brute force (later, untuk testing phase)
+```bash
+hydra -l admin -P /tmp/wordlist.txt ssh://192.168.20.1 -v -I
 ```
 
 ---
@@ -346,7 +389,7 @@ hydra -l admin -P /tmp/wordlist.txt ssh://192.168.10.1
 Network:
   ☐ Debian ping MikroTik: 0% packet loss
   ☐ Kali ping MikroTik: 0% packet loss
-  ☐ MikroTik interfaces aktif (ether1-ISP, ether2)
+  ☐ MikroTik interfaces aktif (ether1-ISP, ether2-DEBIAN, ether3-KALI)
 
 MikroTik:
   ☐ SSH service aktif (port 22)
@@ -374,44 +417,85 @@ Kali:
 
 ### Problem: Connection timeout ke MikroTik
 
-**Solusi:**
+> [!IMPORTANT]
+> **Solusi:**
+> **Verify network connectivity**
 ```bash
-# Verify network connectivity
 ping 192.168.10.1
-
-# Check MikroTik API port
-telnet 192.168.10.1 8728
-
-# Check firewall rule di Debian
-sudo iptables -L | grep 8728
-
-# Verify MikroTik API enabled
-ssh admin@192.168.10.1
-[admin@MikroTik] > ip/service/print
-# Pastikan API port 8728 aktif (X flag = disabled)
 ```
+> **Check MikroTik API port**
+```bash
+telnet 192.168.10.1 8728
+```
+> **Check firewall rule di Debian**
+```bash
+sudo iptables -L | grep 8728
+```
+> **Verify MikroTik API enabled**
+```bash
+ssh -o MACs=hmac-sha1 admin@192.168.10.1
+```
+```bash
+[admin@MikroTik] > ip service print
+```
+> [!WARNING]
+> Pastikan API port 8728 aktif (X flag = disabled)
 
 ### Problem: Failed login attempts not logged
-
-**Solusi:**
+> [!IMPORTANT]
+> **Solusi:**
+> **Enable SSH logging di MikroTik**
 ```bash
-# Enable SSH logging di MikroTik
-[admin@MikroTik] > system/logging/add topics=account,info action=disk
-
-# Check log directory
-[admin@MikroTik] > file/print
-# Pastikan /var/log exist dan writable
+[admin@MikroTik] > system logging add topics=account,info action=disk
 ```
+> **Check log directory**
+```bash
+[admin@MikroTik] > file print
+```
+> Pastikan /var/log exist dan writable
 
 ### Problem: Python import error (routeros-api)
-
-**Solusi:**
+> [!IMPORTANT]
+> **Solusi:**
+> **Reinstall dalam venv**
 ```bash
-# Reinstall dalam venv
 source ~/TME-CORE/venv/bin/activate
+```
+```bash
 pip uninstall routeros-api -y
+```
+```bash
 pip install routeros-api==0.21.0
-
-# Test import
+```
+> Test import
+```bash
 python3 -c "import routeros_api; print(routeros_api.__version__)"
 ```
+
+### Problem: Brute Force With Hydra tools
+*`[ERROR] could not connect to ssh://192.168.20.1:22 - kex error : no match for method mac algo client->server: server [hmac-sha1,hmac-md5], client [hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512]`*
+
+> [!IMPORTANT]
+> **Solusi:**
+> Mengubah atau memodifikasi ssh kali linux bisa memakai hmac-sha1 juga.
+```bash
+cd /etc/ssh
+```
+> Kemudian melihat file config ssh
+```bash
+ls -la
+```
+> Pastikan menemukan file: 
+`ssh_config` dan membukanya dengan `editor nano`.
+
+> [!WARNING]
+> Memodifikasi file config ssh dengan menambahkan skrip berikut:
+```bash
+# Menambahkan generate ssh dengan HASH MAC-SHA1 ke semua host
+Host *
+	hmac-sha1,hmac-md5
+```
+`Ctrl + o` Untuk Simpan `Enter` Kemudian `Ctrl + x` Untuk keluar `editor nano`.
+
+> [!IMPORTANT]
+> Setelah itu Coba Brute Force ulang.

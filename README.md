@@ -13,7 +13,7 @@ Sistem mitigasi otomatis serangan Brute Force SSH/FTP pada Router MikroTik denga
 NDLC (Need, Design, Logical, Complete) untuk siklus pengembangan sistematis dan dokumentasi skripsi.
 
 ## Setup Lab
-Lihat `docs/setup_lab.md` untuk panduan lengkap.
+Lihat **`docs\SETUP_LAB.md`** untuk panduan lengkap.
 
 ## Status
 🔄 Development in progress (NDLC: Initiation phase)

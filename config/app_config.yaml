@@ -19,6 +19,9 @@ logging:
   level: INFO
 
 detection:
+  log_file_ssh: '/home/teungku/TME-CORE/data/logs/514MikroTik.log'
+  log_file_ftp: '/var/log/vsftpd.log'
+
   brute_force:
     threshold: 10              # >= 10 failed attempts
     window_seconds: 60         # dalam 60 seconds
