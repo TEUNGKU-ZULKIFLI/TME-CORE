@@ -89,14 +89,20 @@ class LogParser:
 
 # Test
 if __name__ == "__main__":
-    parser = LogParser('/home/teungku/TME-CORE/data/logs/514MikroTik.log')
+    from src.config import get_config
+    
+    config = get_config()
+    log_path = config.get('detection', {}).get(
+        'log_file_ssh', 
+        '/home/teungku/TME-CORE/data/logs/514MikroTik.log'
+    )
+    
+    parser = LogParser(log_path)
     parser.open()
     
-    count = 0
-    for event in parser.stream_events():
-        print(f"Event: {event.source_ip} → {event.result}")
-        count += 1
-        if count >= 10:  # Stop after 10 events for test
+    print(f"✅ Reading logs from: {log_path}")
+    for i, event in enumerate(parser.stream_events()):
+        print(f"Event {i}: {event.source_ip} → {event.result}")
+        if i >= 5:
             break
-    
     parser.close()
