@@ -1,55 +1,38 @@
-# Environment
+# Virtual environments
 venv/
-.venv/
 env/
-*.env
-!.env.example
+ENV/
+*.venv
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Local environment
+.env
+.env.local
+*.secrets
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-
-# Data
-data/logs/*.log
-data/db/*.db
-data/metrics/*.csv
-data/metrics/*.json
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Legacy
-legacy/
-*.bak
+# Runtime generated (ephemeral)
+data/logs/514MikroTik.log
+data/db/
+*.tmp
+
+# BUT DO TRACK sample data & result summaries
+!data/samples/
+!data/samples/**
+!data/metrics/baseline_metrics.csv
+!data/metrics/analysis-summary.csv
