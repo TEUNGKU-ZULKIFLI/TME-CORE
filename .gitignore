@@ -27,7 +27,8 @@ __pycache__/
 Thumbs.db
 
 # Runtime generated (ephemeral)
-data/logs/514MikroTik.log
+data/logs/
+data/metrics/
 data/db/
 *.tmp
 
