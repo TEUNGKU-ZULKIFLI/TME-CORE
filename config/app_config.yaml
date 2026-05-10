@@ -7,10 +7,9 @@ app:
 mikrotik:
   host: 192.168.10.1
   username: admin
-  password: 085213
+  # password: LOAD FROM .env (not in git!)
   port: 8728
   timeout: 10
-  # address_list_name: brute_force_block
 
 logging:
   log_file: /var/log/auth.log
