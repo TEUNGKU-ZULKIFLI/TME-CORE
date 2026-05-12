@@ -79,11 +79,24 @@ class TMECore:
             max_consecutive_errors = 10
             
             for event in self.parser.stream_events():
+                logger.debug(f"Event: {event.source_ip} → {event.result}")
+                
+                # ✅ JALUR A
+                is_bf_threat = self.detector.process_event(event)
+                
+                # ✅ JALUR B - Sample CPU dan check anomaly
                 try:
-                    # Detect threat
-                    is_threat = self.detector.process_event(event)
-                    
-                    if is_threat and event.source_ip not in self.blocked_ips:
+                    cpu_info = self.api.get_router_cpu()
+                    self.detector_anomaly.add_cpu_sample(cpu_info['cpu_load'])
+                    is_anomaly = self.detector_anomaly.process_login_event(event, cpu_info['cpu_load'])
+                except Exception as e:
+                    logger.debug(f"Anomaly check error: {e}")
+                    is_anomaly = False
+                
+                # ✅ Combined threat decision
+                is_threat = is_bf_threat or is_anomaly
+                
+                if is_threat and event.source_ip not in self.blocked_ips:
                         try:
                             # BLOCK IP dengan error handling
                             logger.warning(f"🚨 THREAT: {event.source_ip} - BLOCKING...")
@@ -123,11 +136,9 @@ class TMECore:
                         if consecutive_errors >= max_consecutive_errors:
                             raise Exception(f"Too many consecutive blocking errors ({consecutive_errors})")
                     
-                except Exception as e:
-                    logger.warning(f"⚠️ Error processing event: {e}")
-                    consecutive_errors += 1
-                    continue
-            
+        except Exception as e:
+            logger.warning(f"⚠️ Error processing event: {e}")
+            consecutive_errors += 1
         except KeyboardInterrupt:
             logger.info("\n⏹️ Shutdown signal received")
         except APIConnectionError as e:
