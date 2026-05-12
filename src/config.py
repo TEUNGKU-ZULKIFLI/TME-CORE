@@ -87,45 +87,52 @@ def load_config_from_yaml(yaml_path: str = None) -> Dict[str, Any]:
 
 def get_config() -> Dict[str, Any]:
     """
-    Get combined configuration dari environment + YAML
-
-    Priority:
-    1. Load YAML file (app_config.yaml)
-    2. Override dengan environment variables
-    3. Set defaults
-
-    Returns:
-        Dictionary dengan final configuration
-
+    Load config dengan priority:
+    1. Load YAML file (defaults)
+    2. Load .env file (secrets & overrides)
+    3. Validate all required fields
+    4. Return merged config
+    
     Example:
         config = get_config()
-        print(config['mikrotik']['host'])
-        # Output: 192.168.10.1
+        print(config['mikrotik']['password'])  # From .env
     """
     try:
-        # Load dari YAML (priority 1)
+        # STEP 1: Load YAML (structure & defaults)
         try:
-            config = load_config_from_yaml()
+            yaml_config = load_config_from_yaml()
         except ConfigError:
-            logger.warning("YAML config not found, using default config")
-            config = {
+            logger.warning("YAML config not found, using minimal defaults")
+            yaml_config = {
                 'app': {'name': 'TME-CORE', 'version': '1.0.0'},
-                'mikrotik': {},
-                'detection': {},
-                'telegram': {},
-                'database': {}
+                'mikrotik': {
+                    'host': '192.168.10.1',
+                    'username': 'admin',
+                    'port': 8728,
+                    'timeout': 10
+                },
+                'detection': {
+                    'log_file_ssh': '/home/teungku/TME-CORE/data/logs/514MikroTik.log',
+                    'brute_force': {'threshold': 10, 'window_seconds': 60},
+                    'anomaly': {'cpu_spike_threshold': 30, 'window_seconds': 60}
+                }
             }
-
-        # Override dengan environment variables (priority 2)
+        
+        # STEP 2: Load .env (secrets & production overrides)
         env_vars = load_config_from_env()
-        config['mikrotik']['host'] = env_vars.get('MIKROTIK_HOST', '192.168.10.1')
-        config['mikrotik']['username'] = env_vars.get('MIKROTIK_USERNAME', 'admin')
-        config['mikrotik']['password'] = env_vars.get('MIKROTIK_PASSWORD')
-        config['mikrotik']['port'] = int(env_vars.get('MIKROTIK_PORT', '8728'))
-
-        logger.info("✓ Configuration loaded successfully")
-        return config
-
+        
+        # STEP 3: Override YAML dengan ENV (ENV has priority!)
+        yaml_config['mikrotik']['host'] = env_vars.get('MIKROTIK_HOST')
+        yaml_config['mikrotik']['username'] = env_vars.get('MIKROTIK_USERNAME')
+        yaml_config['mikrotik']['password'] = env_vars.get('MIKROTIK_PASSWORD')  # FROM ENV!
+        yaml_config['mikrotik']['port'] = int(env_vars.get('MIKROTIK_PORT', '8728'))
+        
+        # STEP 4: Validate critical fields
+        validate_config(yaml_config)
+        
+        logger.info("✓ Configuration loaded successfully (YAML + ENV merged)")
+        return yaml_config
+    
     except Exception as e:
         logger.error(f"✗ Failed to load configuration: {e}")
         raise ConfigError(f"Config error: {e}")
@@ -133,30 +140,28 @@ def get_config() -> Dict[str, Any]:
 
 def validate_config(config: Dict[str, Any]) -> bool:
     """
-    Validate configuration
-
-    Args:
-        config: Configuration dictionary
-
-    Returns:
-        True jika valid
-
-    Raises:
-        ConfigError jika invalid
+    Validate configuration - STRICT!
+    
+    Raises: ConfigError if any required field missing
     """
-    required_keys = {
+    required = {
         'mikrotik': ['host', 'username', 'password', 'port'],
+        'detection': ['log_file_ssh', 'brute_force', 'anomaly']
     }
-
-    for section, keys in required_keys.items():
+    
+    for section, keys in required.items():
         if section not in config:
-            raise ConfigError(f"Missing config section: {section}")
-
+            raise ConfigError(f"❌ Missing config section: [{section}]")
+        
         for key in keys:
             if key not in config[section]:
-                raise ConfigError(f"Missing config key: {section}.{key}")
-
-    logger.info("✓ Configuration validated")
+                raise ConfigError(f"❌ Missing config [{section}].{key}")
+            
+            # Special: password MUST come from .env (never empty!)
+            if key == 'password' and not config[section][key]:
+                raise ConfigError(f"❌ MIKROTIK_PASSWORD not set in .env! (required)")
+    
+    logger.info("✓ Configuration validated - all required fields present")
     return True
 
 

@@ -1,11 +1,11 @@
 import logging
 import time
 from datetime import datetime
-
 from src.config import get_config
 from src.logger import setup_logger
 from src.api.mikrotik_client import MikroTikClient
 from src.parser.log_parser import LogParser
+from src.detection.anomaly_detector import AnomalyDetector
 from src.detection.brute_force_detector import BruteForceDetector
 
 logger = setup_logger("engine")
@@ -26,6 +26,10 @@ class TMECore:
         self.detector = BruteForceDetector(
             threshold=config['detection']['brute_force']['threshold'],
             window_seconds=config['detection']['brute_force']['window_seconds']
+        )
+        self.detector_anomaly = AnomalyDetector(
+            cpu_spike_threshold=config['detection']['anomaly'].get('cpu_spike_threshold', 30),
+            window_seconds=config['detection']['anomaly'].get('window_seconds', 60)
         )
         
         self.blocked_ips = set()
@@ -53,12 +57,23 @@ class TMECore:
             logger.info("📡 Listening for events...")
             
             for event in self.parser.stream_events():
-                logger.debug(f"Event: {event.source_ip} → {event.result} ({event.service})")
+                # Jalur A: Brute Force Detection
+                is_bf_threat = self.detector.process_event(event)
                 
-                # Detect threat
-                is_threat = self.detector.process_event(event)
+                # Jalur B: Anomaly Detection (optional)
+                cpu_info = self.api.get_router_cpu()
+                self.detector_anomaly.add_cpu_sample(cpu_info['cpu_load'])
+                is_anomaly = self.detector_anomaly.process_login_event(
+                    event, 
+                    current_cpu=cpu_info['cpu_load']
+                )
+                
+                # Combined threat decision
+                is_threat = is_bf_threat or is_anomaly
                 
                 if is_threat and event.source_ip not in self.blocked_ips:
+                    # block logic (unchanged)
+                    logger.warning(f"🚨 THREAT: {event.source_ip}")
                     # BLOCK IP
                     logger.warning(f"🚨 THREAT: {event.source_ip} - BLOCKING...")
                     
