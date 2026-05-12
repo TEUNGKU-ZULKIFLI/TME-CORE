@@ -27,6 +27,10 @@ class TMECore:
             threshold=config['detection']['brute_force']['threshold'],
             window_seconds=config['detection']['brute_force']['window_seconds']
         )
+        self.detector_anomaly = AnomalyDetector(
+            cpu_spike_threshold=config['detection']['anomaly'].get('cpu_spike_threshold', 30),
+            window_seconds=config['detection']['anomaly'].get('window_seconds', 60)
+        )
         
         self.blocked_ips = set()
         self.metrics = []
