@@ -1,5 +1,5 @@
 # ==========================================
-# FILE: parser/log_parser.py
+# FILE: src/parser/log_parser.py
 # FUNGSI: Pengecekan Raw Data Log MikroTik
 # ==========================================
 import config.config
