@@ -1,9 +1,9 @@
 # TME-CORE: MikroTik Threat Mitigation Engine
-> **Deskripsi**:
+> **Deskripsi**:</br>
 Sistem mitigasi otomatis serangan Brute Force SSH/FTP pada Router MikroTik dengan engine eksternal berbasis Python. Engine berjalan di server Debian dan menganalisa log secara real-time, mendeteksi anomali, dan melakukan blocking otomatis via API RouterOS dengan latency < 5 detik.
 
 ### 🧑‍💻 TAHAP: Pengecekan Raw Data Log MikroTik
-> **Deskripsi**:
+> **Deskripsi**:</br>
 Mengambil data log mikrotik dasar dengan 5 RAW LOG TERAKHIR!</br>
 Pada Dasarnya sama seperti terminal mikrotik dengan `log print`
 
