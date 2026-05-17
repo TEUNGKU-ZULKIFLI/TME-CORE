@@ -2,8 +2,8 @@
 # FILE: src/api/connection.py
 # FUNGSI: Jembatan komunikasi ke RouterOS
 # ==========================================
-import routeros_api
 import config.config
+import routeros_api
 
 def connect_to_mikrotik():
     """

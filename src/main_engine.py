@@ -2,10 +2,17 @@
 # FILE: src/main_engine.py
 # FUNGSI: Deteksi, Evaluasi, Notifikasi & Whitelist
 # ==========================================
+import sys
+import os
+# Agar main_engine.py bisa mengenali folder 'config', 'src', dsb.
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if BASE_DIR not in sys.path:
+    sys.path.append(BASE_DIR)
+
 import re
 import time
 import datetime
-import config.config
+from config import config
 from src.api.connection import connect_to_mikrotik, disconnect_from_mikrotik
 from src.firewall.mitigator_jalur_a import block_ip
 from src.alert.notifier import send_telegram_alert
@@ -38,7 +45,7 @@ def record_performance_data(api, attacker_ip, action_taken):
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         log_line = f"[{timestamp}] IP: {attacker_ip} | Aksi: {action_taken} | CPU: {cpu_load}% | Sisa RAM: {free_memory:.2f}MB / {total_memory:.2f}MB\n"
         
-        with open("tmecore.log", "a") as f:
+        with open(config.LOG_FILE_PATH, "a") as f:
             f.write(log_line)
         print(f"[*] DATA EVALUASI: CPU {cpu_load}% | RAM sisa {free_memory:.2f}MB")
     except Exception as e:
@@ -74,7 +81,7 @@ def process_engine(api):
                         continue
 
                     # FITUR WHITELIST
-                    if ip_attacker in config.config.WHITELIST_IPS:
+                    if ip_attacker in config.WHITELIST_IPS:
                         print(f"[-] ABAIKAN: IP {ip_attacker} (Admin) dilindungi Whitelist.")
                         processed_log_ids.add(log_id)
                         continue 
@@ -82,10 +89,10 @@ def process_engine(api):
                     failed_attempts[ip_attacker] = failed_attempts.get(ip_attacker, 0) + 1
                     print(f"[!] DETEKSI: Gagal login dari {ip_attacker} (Gagal ke-{failed_attempts[ip_attacker]})")
                     
-                    if failed_attempts[ip_attacker] == config.config.MAX_FAILED_ATTEMPTS - 1:
+                    if failed_attempts[ip_attacker] == config.MAX_FAILED_ATTEMPTS - 1:
                          record_performance_data(api, ip_attacker, "SEDANG DISERANG")
                     
-                    if failed_attempts[ip_attacker] >= config.config.MAX_FAILED_ATTEMPTS:
+                    if failed_attempts[ip_attacker] >= config.MAX_FAILED_ATTEMPTS:
                         print(f"[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada {ip_attacker}!")
                         sukses = block_ip(api, ip_attacker)
                         
