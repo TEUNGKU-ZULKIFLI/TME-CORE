@@ -2,25 +2,16 @@
 > **Deskripsi**:
 Sistem mitigasi otomatis serangan Brute Force SSH/FTP pada Router MikroTik dengan engine eksternal berbasis Python. Engine berjalan di server Debian dan menganalisa log secara real-time, mendeteksi anomali, dan melakukan blocking otomatis via API RouterOS dengan latency < 5 detik.
 
-### 🧑‍💻 TAHAP: Mengambil data Log MikroTik
+### 🧑‍💻 TAHAP: Pengecekan Raw Data Log MikroTik
 > **Deskripsi**:
 Mengambil data log mikrotik dasar dengan 5 RAW LOG TERAKHIR!</br>
 Pada Dasarnya sama seperti terminal mikrotik dengan `log print`
 
 > [!WARNING]
-> > **TAHAP Required: Tentunya Sudah Mengikuti TAHAP 1 dong!**</br>
-> > Clone pake **`SSH`**
-> > ```bash
-> > git clone git@github.com:TEUNGKU-ZULKIFLI/TME-CORE.git
-> > ```
-> > Atau memakai **`HTTPS`**
-> > ```bash
-> > git clone https://github.com/TEUNGKU-ZULKIFLI/TME-CORE.git
-> > ```
-> > Kemudian masuk kedirectory tersebut
-> > ```bash
-> > cd TME-CORE
-> > ```
+> > **`SUDAH MENGIKUTI TAHAPAN BERIKUT INI:`**</br>
+> > **🧑‍💻 TAHAP: Jembatan komunikasi ke RouterOS**</br>
+> > **Deskripsi**:</br>
+> > *Membangun koneksi dasar!*</br>
 
 #### TAHAP 2: Memulai fetching data log MikroTik
 Pastinya dilingkungan **`Virtual Environment`**

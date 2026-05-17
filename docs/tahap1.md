@@ -2,7 +2,7 @@
 > **Deskripsi**:
 Sistem mitigasi otomatis serangan Brute Force SSH/FTP pada Router MikroTik dengan engine eksternal berbasis Python. Engine berjalan di server Debian dan menganalisa log secara real-time, mendeteksi anomali, dan melakukan blocking otomatis via API RouterOS dengan latency < 5 detik.
 
-### 🧑‍💻 TAHAP: Membuat File Konfigurasi dan Koneksi
+### 🧑‍💻 TAHAP: Jembatan komunikasi ke RouterOS
 > **Deskripsi**:
 Membangun koneksi dasar!
 
@@ -61,7 +61,7 @@ pip list
 ```bash
 python3 -m src.api.connection
 ```
-Diharapkan Ouput:
+Ouput expect:
 ```bash
 (venv) user@user:~/TME-CORE$ python3 -m src.api.connection
 Mencoba koneksi ke MikroTik...

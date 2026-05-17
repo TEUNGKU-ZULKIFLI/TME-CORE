@@ -2,55 +2,19 @@
 > **Deskripsi**:
 Sistem mitigasi otomatis serangan Brute Force SSH/FTP pada Router MikroTik dengan engine eksternal berbasis Python. Engine berjalan di server Debian dan menganalisa log secara real-time, mendeteksi anomali, dan melakukan blocking otomatis via API RouterOS dengan latency < 5 detik.
 
-### 🧑‍💻 TAHAP: Mendeteksi Kegagalan Login
+### 🧑‍💻 TAHAP: Jalur A - Mendeteksi log Brute Force
 > **Deskripsi**:
 Mendeteksi dengan cara memantau log berkala, serta membatasi jika kegagalan login mencapai `THRESHOLD` maka siap untuk dikirimkan ke`modul blokir`.
 
 > [!WARNING]
-> > **TAHAP Required: Tentunya Sudah Mengikuti TAHAP 1 &2 dong!**</br>
-> > Clone pake **`SSH`**
-> > ```bash
-> > git clone git@github.com:TEUNGKU-ZULKIFLI/TME-CORE.git
-> > ```
-> > Atau memakai **`HTTPS`**
-> > ```bash
-> > git clone https://github.com/TEUNGKU-ZULKIFLI/TME-CORE.git
-> > ```
-> > Kemudian masuk kedirectory tersebut
-> > ```bash
-> > cd TME-CORE
-> > ```
-> > 
-> > **TAHAP 2: Memulai fetching data log MikroTik**</br>
-> > Pastinya dilingkungan **`Virtual Environment`**
-> > ```bash
-> > source venv/bin/activate
-> > ```
-> > Langsung Gas dengan Log ParserNya:
-> > ```bash
-> > python3 -m src.parser.log_parser
-> > ```
-> > Output Expect:
-> > ```bash
-> > (venv) user@user:~/TME-CORE$ python3 -m src.parser.log_parser
-> > [+] SUKSES: Terhubung ke MikroTik xxx.xxx.xxx.1
-> > 
-> > [*] Mengambil raw data log dari API MikroTik...
-> > [*] Jumlah total log di memory MikroTik saat ini: 221
-> > 
-> > === 5 RAW LOG TERAKHIR ===
-> > {'id': '*D8', 'time': '07:54:04', 'topics': 'system,info,account', 'message': 'user admin logged in from xxx.xxx.xxx.2 via api'}
-> > {'id': '*D9', 'time': '07:54:04', 'topics': 'system,info,account', 'message': 'user admin logged out from xxx.xxx.xxx.2 via api'}
-> > {'id': '*DA', 'time': '07:58:24', 'topics': 'system,info,account', 'message': 'user admin logged in from xxx.xxx.xxx.2 via ssh'}
-> > {'id': '*DB', 'time': '07:58:59', 'topics': 'system,info,account', 'message': 'user admin logged out from xxx.xxx.xxx.2 via ssh'}
-> > {'id': '*DC', 'time': '08:34:52', 'topics': 'system,info,account', 'message': 'user admin logged in from xxx.xxx.xxx.2 via api'}
-> > ==========================
-> > 
-> > [*] Koneksi ke MikroTik ditutup dengan aman.
-> > (venv) user@user:~/TME-CORE$
-> > ```
-> > > [!TIP]
-> > > Samakah Output dengan expect? kalau sama rayakan dengan teman sebelahmu itu 🫵🎉.
+> > **`SUDAH MENGIKUTI TAHAPAN BERIKUT INI:`**</br>
+> > **🧑‍💻 TAHAP: Jembatan komunikasi ke RouterOS**</br>
+> > **Deskripsi**:</br>
+> > *Membangun koneksi dasar!*</br>
+> > **🧑‍💻 TAHAP: Pengecekan Raw Data Log MikroTik**</br>
+> > **Deskripsi**:</br>
+> > *Mengambil data log mikrotik dasar dengan 5 RAW LOG TERAKHIR!*</br>
+> > *Pada Dasarnya sama seperti terminal mikrotik dengan `log print`*</br>
 
 #### TAHAP 3.1: Mulai deteksi kegagalan login
 Pastinya dilingkungan **`Virtual Environment`**
@@ -142,8 +106,117 @@ Terminal **`Detector Jalur A`** hasilnya:
 [*] [DEBUG] Mengambil 22 log dari MikroTik...
 [*] [DEBUG] Mengambil 22 log dari MikroTik...
 ```
-#### RANGKUMAN
+##### RANGKUMAN 3.1 - 3.2:
 Dari Output Monitoring `Detector Jalur A` kita mendapatkan info bahwa IP `xxx.xxx.xxx.2` Mencoba login tapi salah mulu passwordnya dengan menetapkan `THRESHOLD` maka siap untuk dikirimkan ke`modul blokir`.
+
+#### TAHAP 3.3: Update Jalur A - Eksekusi pemblokiran IP
+Setup MikroTik:</br>
+Menyiapkan sebuah penampung List IP Penyerang!
+```bash
+[admin@MikroTik] > ip firewall address-list add address=0.0.0.0/32 list=brute_force_block comment="Placeholder - auto-populated by TME-CORE"
+```
+Menyiapkan sebuah aturan firewall untuk memblokir serta memasukkan IP Penyerang ke penampung tadi!
+```bash
+[admin@MikroTik] > ip firewall filter add chain=input src-address-list=brute_force_block action=drop comment="Drop brute_force_block - TME-CORE"
+```
+> [!IMPORTANT]
+> Jalankan ulang **`TAHAP 3.1 s/d 3.2`** dan memastikan IP Tersebut berhasil diblokir!
+
+#### TAHAP 3.4:
+Pastinya dilingkungan **`Virtual Environment`**
+```bash
+source venv/bin/activate
+```
+Langsung Gas dengan Detection:
+```bash
+python3 -m src.detection.detector_jalur_a
+```
+Output expect:
+```bash
+(venv) user@user:~/TME-CORE$ python3 -m src.detection.detector_jalur_a
+[+] SUKSES: Terhubung ke MikroTik xxx.xxx.xxx.1
+[-] TME-CORE (JALUR A) AKTIF: Menunggu serangan masuk...
+[*] Memori disiapkan. Mengabaikan 28 log lama.
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-1)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-2)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-3)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-4)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-5)
+[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada xxx.xxx.xxx.2!
+[*] MITIGASI: IP xxx.xxx.xxx.2 sudah berstatus TERBLOKIR sebelumnya.
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-1)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-2)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-3)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-4)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-5)
+[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada xxx.xxx.xxx.2!
+[*] MITIGASI: IP xxx.xxx.xxx.2 sudah berstatus TERBLOKIR sebelumnya.
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-1)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-2)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-3)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-4)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-5)
+[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada xxx.xxx.xxx.2!
+[*] MITIGASI: IP xxx.xxx.xxx.2 sudah berstatus TERBLOKIR sebelumnya.
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-1)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-2)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-3)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-4)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-5)
+[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada xxx.xxx.xxx.2!
+[*] MITIGASI: IP xxx.xxx.xxx.2 sudah berstatus TERBLOKIR sebelumnya.
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-1)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-2)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-3)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-4)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-5)
+[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada xxx.xxx.xxx.2!
+[*] MITIGASI: IP xxx.xxx.xxx.2 sudah berstatus TERBLOKIR sebelumnya.
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-1)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-2)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-3)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-4)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-5)
+[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada xxx.xxx.xxx.2!
+[*] MITIGASI: IP xxx.xxx.xxx.2 sudah berstatus TERBLOKIR sebelumnya.
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-1)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-2)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-3)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-4)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-5)
+[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada xxx.xxx.xxx.2!
+[*] MITIGASI: IP xxx.xxx.xxx.2 sudah berstatus TERBLOKIR sebelumnya.
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-1)
+```
+Kemudian close dengan mengetik **`Ctrl + c`**:
+```bash
+^C
+[*] Pemantauan dihentikan user.
+[*] Koneksi ke MikroTik ditutup dengan aman.
+(venv) user@user:~/TME-CORE$
+```
+Validasi dengan login ke MikroTik dan cek:
+```bash
+[admin@MikroTik] > ip firewall address-list print
+```
+Output expect:
+```bash
+Flags: X - disabled, D - dynamic
+ #   LIST             					            ADDRESS		    CREATION-TIME        TIMEOUT
+ 0   ;;; Placeholder - auto-populated by TME-CORE
+     brute_force_block 					            0.0.0.0		    may/08/2026 02:08:32
+ 1 D ;;; Auto-blocked by TME-CORE
+     brute_force_block 					            xxx.xxx.xxx.2	may/16/2026 01:56:55 50m40s
+```
+> [!TIP]
+> **Untuk menghapus IP tersebut dari list `IP Peretas` dengan**:</br>
+> ```bash
+> [admin@MikroTik] > ip firewall address-list remove numbers=1
+> ```
+> **Lalu cek Kembali dengan**:</br>
+> ```bash
+> [admin@MikroTik] > ip firewall address-list print
+> ```
 
 ### RECAP ALL:
 > **`TAHAPAN 3.1:`**
