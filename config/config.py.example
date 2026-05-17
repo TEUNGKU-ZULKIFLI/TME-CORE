@@ -1,0 +1,28 @@
+# ==========================================
+# FILE: config/config.py.example
+# FUNGSI: Menyimpan semua kredensial rahasia
+# COPI FILE INI dan SETUP: cp config/config.py.example config/config.py
+# ==========================================
+
+# 1. Kredensial MikroTik (RouterBoard)
+MIKROTIK_IP = "xxx.xxx.xxx.xxx"     # Sesuaikan dengan IP MikroTik yang menghadap ke Debian
+MIKROTIK_USER = "admin"             # Disarankan buat user khusus API selain admin
+MIKROTIK_PASS = "*****"
+MIKROTIK_PORT = 8728                # Default port API MikroTik (Gunakan 8729 untuk API-SSL jika aktif)
+
+# 2. Threshold JALUR A (Pola Login)
+MAX_FAILED_ATTEMPTS = 5       # Berapa kali gagal login sebelum diblokir?
+BLOCK_TIMEOUT = "1h"          # Lama pemblokiran (misal: 1 jam, atau "1d" untuk 1 hari)
+ADDRESS_LIST_NAME = "brute_force_block"
+
+# DAFTAR IP ADMIN/SERVER YANG KEBAL BLOKIR (Tidak akan pernah diblokir)
+# Tambahkan IP SERVER kamu atau IP Laptop Windows kamu di sini
+WHITELIST_IPS = ["xxx.xxx.xxx.xxx", "xxx.xxx.xxx.xxx", "xxx.xxx.xxx.xxx"]
+
+# 3. Threshold JALUR B (Beban Router)
+MAX_CPU_USAGE = 80            # Batas toleransi CPU (%) sebelum alarm berbunyi
+MAX_RAM_USAGE = 90            # Batas toleransi RAM (%) (Opsional)
+
+# 4. Kredensial Bot Telegram
+TELEGRAM_TOKEN = ""
+TELEGRAM_CHAT_ID = ""

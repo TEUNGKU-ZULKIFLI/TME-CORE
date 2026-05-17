@@ -15,6 +15,8 @@ __pycache__/
 .env
 .env.local
 *.secrets
+config/config.py
+tmecore.log
 
 # IDE
 .vscode/
@@ -25,15 +27,3 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
-
-# Runtime generated (ephemeral)
-data/logs/
-data/metrics/
-data/db/
-*.tmp
-
-# BUT DO TRACK sample data & result summaries
-!data/samples/
-!data/samples/**
-!data/metrics/baseline_metrics.csv
-!data/metrics/analysis-summary.csv

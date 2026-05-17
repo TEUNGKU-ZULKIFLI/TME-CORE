@@ -1,19 +1,29 @@
-# TME-CORE: MikroTik Threat Mitigation Engine
+# 🚀 TME-CORE: MikroTik Threat Mitigation Engine
 
-## Deskripsi
-Sistem mitigasi otomatis serangan Brute Force SSH/FTP pada Router MikroTik dengan engine eksternal berbasis Python. Engine berjalan di server Debian dan menganalisa log secara real-time, mendeteksi anomali, dan melakukan blocking otomatis via API RouterOS dengan latency < 5 detik.
+> **Deskripsi Singkat**  </br>
+TME-CORE adalah sistem otomatis untuk mitigasi serangan Brute Force SSH/FTP pada Router MikroTik.  
+Engine berbasis Python ini berjalan di server Debian, menganalisa log secara real-time, mendeteksi anomali, dan melakukan blocking otomatis via API RouterOS dengan latency < 5 detik. ⚡
 
-## Arsitektur
-- **Target**: MikroTik RouterOS 6.49.19 (port 21/FTP, 22/SSH, 8728/API)
-- **Engine**: Python pada Debian Server
-- **Attacker**: Kali Linux (simulasi brute force dengan Hydra/Medusa)
-- **Monitoring**: CPU router, failed login attempts, response time
+---
 
-## Metodologi
-NDLC (Need, Design, Logical, Complete) untuk siklus pengembangan sistematis dan dokumentasi skripsi.
+## 📚 Tahapan Setup
+1. 🛠️ [TAHAP 1: Jembatan komunikasi ke RouterOS](docs/tahap1.md)  
+2. 📡 [TAHAP 2: Pengecekan Raw Data Log MikroTik](docs/tahap2.md)
+3. 🕵️‍♂️ [TAHAP 3: Jalur A - Mendeteksi log Brute Force](docs/tahap3.md)
+4. 👁️ [TAHAP 4: Jalur B - Menganalisa Beban Router (CPU Monitor)](docs/tahap4.md)
+5. ⚙️ [TAHAP 5: Menggabungkan Jalur A (Deteksi) & Jalur B (Evaluasi Kinerja)](docs/tahap5.md)
+6. 📩 [TAHAP 6: Mengirim Notifikasi ke Telegram](docs/tahap6.md)
+7. 🕐 [TAHAP 7: Menjadikan TME-CORE Berjalan di Background (Systemd)](docs/tahap7.md)
 
-## Setup Lab
-Lihat **`docs\SETUP_LAB.md`** untuk panduan lengkap.
+---
 
-## Status
-🔄 Development in progress (NDLC: Initiation phase)
+## ✨ Fitur Utama
+- 🔍 Analisis log real-time
+- 🛡️ Deteksi anomali brute force
+- ⚡ Blocking otomatis < 5 detik
+- 🔗 Integrasi langsung dengan RouterOS API
+
+---
+
+## 🎯 Tujuan
+Memberikan perlindungan ekstra pada Router MikroTik dengan cara yang **ringan, cepat, dan fun** untuk sysadmin yang ingin tidur lebih nyenyak 😴.
