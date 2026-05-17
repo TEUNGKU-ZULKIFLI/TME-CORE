@@ -8,7 +8,7 @@ Mengambil data log mikrotik dasar dengan 5 RAW LOG TERAKHIR!</br>
 Pada Dasarnya sama seperti terminal mikrotik dengan `log print`
 
 > [!WARNING]
-> > **TAHAP Required: Tentunya Sudah Mengikuti TAHAP 1 dong!**
+> > **TAHAP Required: Tentunya Sudah Mengikuti TAHAP 1 dong!**</br>
 > > Clone pake **`SSH`**
 > > ```bash
 > > git clone git@github.com:TEUNGKU-ZULKIFLI/TME-CORE.git
@@ -34,17 +34,17 @@ python3 -m src.parser.log_parser
 Output Expect:
 ```bash
 (venv) user@user:~/TME-CORE$ python3 -m src.parser.log_parser
-[+] SUKSES: Terhubung ke MikroTik xxx.xxx.xxx.xxx
+[+] SUKSES: Terhubung ke MikroTik xxx.xxx.xxx.1
 
 [*] Mengambil raw data log dari API MikroTik...
 [*] Jumlah total log di memory MikroTik saat ini: 221
 
 === 5 RAW LOG TERAKHIR ===
-{'id': '*D8', 'time': '07:54:04', 'topics': 'system,info,account', 'message': 'user admin logged in from xxx.xxx.xxx.xxx via api'}
-{'id': '*D9', 'time': '07:54:04', 'topics': 'system,info,account', 'message': 'user admin logged out from xxx.xxx.xxx.xxx via api'}
-{'id': '*DA', 'time': '07:58:24', 'topics': 'system,info,account', 'message': 'user admin logged in from xxx.xxx.xxx.xxx via ssh'}
-{'id': '*DB', 'time': '07:58:59', 'topics': 'system,info,account', 'message': 'user admin logged out from xxx.xxx.xxx.xxx via ssh'}
-{'id': '*DC', 'time': '08:34:52', 'topics': 'system,info,account', 'message': 'user admin logged in from xxx.xxx.xxx.xxx via api'}
+{'id': '*D8', 'time': '07:54:04', 'topics': 'system,info,account', 'message': 'user admin logged in from xxx.xxx.xxx.2 via api'}
+{'id': '*D9', 'time': '07:54:04', 'topics': 'system,info,account', 'message': 'user admin logged out from xxx.xxx.xxx.2 via api'}
+{'id': '*DA', 'time': '07:58:24', 'topics': 'system,info,account', 'message': 'user admin logged in from xxx.xxx.xxx.2 via ssh'}
+{'id': '*DB', 'time': '07:58:59', 'topics': 'system,info,account', 'message': 'user admin logged out from xxx.xxx.xxx.2 via ssh'}
+{'id': '*DC', 'time': '08:34:52', 'topics': 'system,info,account', 'message': 'user admin logged in from xxx.xxx.xxx.2 via api'}
 ==========================
 
 [*] Koneksi ke MikroTik ditutup dengan aman.
@@ -57,17 +57,17 @@ Output Expect:
 ```bash
 user@user:~/TME-CORE$ source venv/bin/activate
 (venv) user@user:~/TME-CORE$ python3 -m src.parser.log_parser
-[+] SUKSES: Terhubung ke MikroTik xxx.xxx.xxx.xxx
+[+] SUKSES: Terhubung ke MikroTik xxx.xxx.xxx.1
 
 [*] Mengambil raw data log dari API MikroTik...
 [*] Jumlah total log di memory MikroTik saat ini: 221
 
 === 5 RAW LOG TERAKHIR ===
-{'id': '*D8', 'time': '07:54:04', 'topics': 'system,info,account', 'message': 'user admin logged in from xxx.xxx.xxx.xxx via api'}
-{'id': '*D9', 'time': '07:54:04', 'topics': 'system,info,account', 'message': 'user admin logged out from xxx.xxx.xxx.xxx via api'}
-{'id': '*DA', 'time': '07:58:24', 'topics': 'system,info,account', 'message': 'user admin logged in from xxx.xxx.xxx.xxx via ssh'}
-{'id': '*DB', 'time': '07:58:59', 'topics': 'system,info,account', 'message': 'user admin logged out from xxx.xxx.xxx.xxx via ssh'}
-{'id': '*DC', 'time': '08:34:52', 'topics': 'system,info,account', 'message': 'user admin logged in from xxx.xxx.xxx.xxx via api'}
+{'id': '*D8', 'time': '07:54:04', 'topics': 'system,info,account', 'message': 'user admin logged in from xxx.xxx.xxx.2 via api'}
+{'id': '*D9', 'time': '07:54:04', 'topics': 'system,info,account', 'message': 'user admin logged out from xxx.xxx.xxx.2 via api'}
+{'id': '*DA', 'time': '07:58:24', 'topics': 'system,info,account', 'message': 'user admin logged in from xxx.xxx.xxx.2 via ssh'}
+{'id': '*DB', 'time': '07:58:59', 'topics': 'system,info,account', 'message': 'user admin logged out from xxx.xxx.xxx.2 via ssh'}
+{'id': '*DC', 'time': '08:34:52', 'topics': 'system,info,account', 'message': 'user admin logged in from xxx.xxx.xxx.2 via api'}
 ==========================
 
 [*] Koneksi ke MikroTik ditutup dengan aman.

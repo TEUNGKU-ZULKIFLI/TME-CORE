@@ -2,7 +2,7 @@
 > **Deskripsi**:
 Sistem mitigasi otomatis serangan Brute Force SSH/FTP pada Router MikroTik dengan engine eksternal berbasis Python. Engine berjalan di server Debian dan menganalisa log secara real-time, mendeteksi anomali, dan melakukan blocking otomatis via API RouterOS dengan latency < 5 detik.
 
-### 🧑‍💻 TAHAP 1: Membuat File Konfigurasi dan Koneksi
+### 🧑‍💻 TAHAP: Membuat File Konfigurasi dan Koneksi
 > **Deskripsi**:
 Membangun koneksi dasar!
 
@@ -27,7 +27,7 @@ cp config/config.py.example config/config.py
 Dan mulai mengonfigurasi dengan sesuai seperti:
 ```config
 # 1. Kredensial MikroTik (RouterBoard)
-MIKROTIK_IP = "xxx.xxx.xxx.xxx"  # IP RouterBoard yang bisa ping dari server yang cloning repo ini!
+MIKROTIK_IP = "xxx.xxx.xxx.1"  # IP RouterBoard yang bisa ping dari server yang cloning repo ini!
 MIKROTIK_USER = "admin"       # username RouterBoard dapat disesuaikan
 MIKROTIK_PASS = "*****"       # password RouterBoard
 MIKROTIK_PORT = 8728          # Default port API MikroTik (Gunakan 8729 untuk API-SSL jika aktif)
@@ -65,7 +65,7 @@ Diharapkan Ouput:
 ```bash
 (venv) user@user:~/TME-CORE$ python3 -m src.api.connection
 Mencoba koneksi ke MikroTik...
-[+] SUKSES: Terhubung ke MikroTik xxx.xxx.xxx.xxx
+[+] SUKSES: Terhubung ke MikroTik xxx.xxx.xxx.1
 [*] Koneksi ke MikroTik ditutup dengan aman.
 (venv) user@user:~/TME-CORE$
 ```
@@ -79,8 +79,8 @@ Memastikan diMikroTik dengan:
 ```
 Output Expect:
 ```bash
-07:54:04 system,info,account user admin logged in from xxx.xxx.xxx.xxx via api
-07:54:04 system,info,account user admin logged out from xxx.xxx.xxx.xxx via api
+07:54:04 system,info,account user admin logged in from xxx.xxx.xxx.2 via api
+07:54:04 system,info,account user admin logged out from xxx.xxx.xxx.2 via api
 ```
 
 ### RECAP ALL:
@@ -111,7 +111,7 @@ RouterOS-api 0.21.0
 setuptools   66.1.1
 (venv) user@user:~/TME-CORE$ python3 -m src.api.connection
 Mencoba koneksi ke MikroTik...
-[+] SUKSES: Terhubung ke MikroTik xxx.xxx.xxx.xxx
+[+] SUKSES: Terhubung ke MikroTik xxx.xxx.xxx.1
 [*] Koneksi ke MikroTik ditutup dengan aman.
 (venv) user@user:~/TME-CORE$
 ```
