@@ -4,7 +4,7 @@ Sistem mitigasi otomatis serangan Brute Force SSH/FTP pada Router MikroTik denga
 
 ### 🧑‍💻 TAHAP: Jalur B - Menganalisa Beban Router (CPU Monitor)
 > **Deskripsi**:
-Mendeteksi dengan cara memantau log berkala, serta membatasi jika kegagalan login mencapai `THRESHOLD` maka siap untuk dikirimkan ke`modul blokir`.
+Memonitoring secara berkala **`CPU & Memory`** Router.
 
 > [!WARNING]
 > > **`SUDAH MENGIKUTI TAHAPAN BERIKUT INI:`**</br>

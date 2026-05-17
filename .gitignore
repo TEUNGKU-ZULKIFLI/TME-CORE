@@ -16,6 +16,7 @@ __pycache__/
 .env.local
 *.secrets
 config/config.py
+tmecore.log
 
 # IDE
 .vscode/
