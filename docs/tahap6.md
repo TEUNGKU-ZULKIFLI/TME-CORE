@@ -280,7 +280,8 @@ Dan menerima pesan Bot Telegram dengan berikut ini:
 ✅ Status: IP telah dimasukkan ke Blacklist Firewall MikroTik.
 ```
 Dengan by Visual:</br>
-<img src="./assets/imgs/UI-Mesaage.png" width="600"/></div>
+<img src="./assets/imgs/UI-Mesaage.png" width="600"/>
+</br>
 
 Kemudian closing engine cukup ketik **`Ctrl + c`**:
 ```bash
@@ -313,6 +314,102 @@ Output expect:
 [2026-05-18 02:26:43] IP: xxx.xxx.xxx.2 | Aksi: BERHASIL DIBLOKIR | CPU: 10% | Sisa RAM: 8.33MB / 32.00MB
 ```
 
-### RANGKUMAN:
+#### RANGKUMAN:
 Pada Tahap ini memang sudah bisa merespon ke bot Telegram, akan tetapi data yang dikirim terlalu `nyepam/ngebomb`.</br>
 Untuk selanjutnya kita akan mem`fixedkan` `bug` tersebut itu.
+
+### RECAP ALL:
+```bash
+user@user:~/TME-CORE$ source venv/bin/activate
+(venv) user@user:~/TME-CORE$ python3 -m src.main_engine
+[+] SUKSES: Terhubung ke MikroTik xxx.xxx.xxx.1
+==================================================
+[-] TME-CORE AKTIF: Deteksi (Jalur A) & Evaluasi (Jalur B)
+==================================================
+[*] Memori disiapkan. Mengabaikan 86 log lama.
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-1)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-2)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-3)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-4)
+[*] DATA EVALUASI DISIMPAN: CPU 100% | RAM sisa 8.58MB
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-5)
+[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada xxx.xxx.xxx.2!
+[!] MITIGASI: Mengeksekusi pemblokiran untuk IP xxx.xxx.xxx.2...
+[+] SUKSES: IP xxx.xxx.xxx.2 berhasil dimasukkan ke Address List 'brute_force_block'
+[*] DATA EVALUASI DISIMPAN: CPU 100% | RAM sisa 8.58MB
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-1)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-2)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-3)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-4)
+[*] DATA EVALUASI DISIMPAN: CPU 100% | RAM sisa 8.58MB
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-5)
+[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada xxx.xxx.xxx.2!
+[*] MITIGASI: IP xxx.xxx.xxx.2 sudah berstatus TERBLOKIR sebelumnya.
+[*] DATA EVALUASI DISIMPAN: CPU 100% | RAM sisa 8.58MB
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-1)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-2)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-3)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-4)
+[*] DATA EVALUASI DISIMPAN: CPU 100% | RAM sisa 8.58MB
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-5)
+[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada xxx.xxx.xxx.2!
+[*] MITIGASI: IP xxx.xxx.xxx.2 sudah berstatus TERBLOKIR sebelumnya.
+[*] DATA EVALUASI DISIMPAN: CPU 100% | RAM sisa 8.58MB
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-1)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-2)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-3)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-4)
+[*] DATA EVALUASI DISIMPAN: CPU 100% | RAM sisa 8.58MB
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-5)
+[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada xxx.xxx.xxx.2!
+[*] MITIGASI: IP xxx.xxx.xxx.2 sudah berstatus TERBLOKIR sebelumnya.
+[*] DATA EVALUASI DISIMPAN: CPU 100% | RAM sisa 8.58MB
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-1)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-2)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-3)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-4)
+[*] DATA EVALUASI DISIMPAN: CPU 100% | RAM sisa 8.58MB
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-5)
+[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada xxx.xxx.xxx.2!
+[*] MITIGASI: IP xxx.xxx.xxx.2 sudah berstatus TERBLOKIR sebelumnya.
+[*] DATA EVALUASI DISIMPAN: CPU 100% | RAM sisa 8.58MB
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-1)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-2)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-3)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-4)
+[*] DATA EVALUASI DISIMPAN: CPU 100% | RAM sisa 8.58MB
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-5)
+[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada xxx.xxx.xxx.2!
+[*] MITIGASI: IP xxx.xxx.xxx.2 sudah berstatus TERBLOKIR sebelumnya.
+[*] DATA EVALUASI DISIMPAN: CPU 100% | RAM sisa 8.58MB
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-1)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-2)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-3)
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-4)
+[*] DATA EVALUASI DISIMPAN: CPU 100% | RAM sisa 8.58MB
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-5)
+[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada xxx.xxx.xxx.2!
+[*] MITIGASI: IP xxx.xxx.xxx.2 sudah berstatus TERBLOKIR sebelumnya.
+[*] DATA EVALUASI DISIMPAN: CPU 100% | RAM sisa 8.58MB
+[!] DETEKSI: Gagal login dari xxx.xxx.xxx.2 (Gagal ke-1)
+^C
+[*] Pemantauan dihentikan user.
+[*] Koneksi ke MikroTik ditutup dengan aman.
+(venv) user@user:~/TME-CORE$ tail -f tmecore.log
+[2026-05-18 02:26:30] IP: xxx.xxx.xxx.2 | Aksi: SEDANG DISERANG | CPU: 100% | Sisa RAM: 8.31MB / 32.00MB
+[2026-05-18 02:26:30] IP: xxx.xxx.xxx.2 | Aksi: BERHASIL DIBLOKIR | CPU: 100% | Sisa RAM: 8.31MB / 32.00MB
+[2026-05-18 02:26:35] IP: xxx.xxx.xxx.2 | Aksi: SEDANG DISERANG | CPU: 1% | Sisa RAM: 8.32MB / 32.00MB
+[2026-05-18 02:26:35] IP: xxx.xxx.xxx.2 | Aksi: BERHASIL DIBLOKIR | CPU: 1% | Sisa RAM: 8.32MB / 32.00MB
+[2026-05-18 02:26:36] IP: xxx.xxx.xxx.2 | Aksi: SEDANG DISERANG | CPU: 1% | Sisa RAM: 8.32MB / 32.00MB
+[2026-05-18 02:26:36] IP: xxx.xxx.xxx.2 | Aksi: BERHASIL DIBLOKIR | CPU: 1% | Sisa RAM: 8.32MB / 32.00MB
+[2026-05-18 02:26:37] IP: xxx.xxx.xxx.2 | Aksi: SEDANG DISERANG | CPU: 0% | Sisa RAM: 8.32MB / 32.00MB
+[2026-05-18 02:26:37] IP: xxx.xxx.xxx.2 | Aksi: BERHASIL DIBLOKIR | CPU: 0% | Sisa RAM: 8.32MB / 32.00MB
+[2026-05-18 02:26:37] IP: xxx.xxx.xxx.2 | Aksi: SEDANG DISERANG | CPU: 0% | Sisa RAM: 8.32MB / 32.00MB
+[2026-05-18 02:26:38] IP: xxx.xxx.xxx.2 | Aksi: BERHASIL DIBLOKIR | CPU: 0% | Sisa RAM: 8.32MB / 32.00MB
+[2026-05-18 02:26:39] IP: xxx.xxx.xxx.2 | Aksi: SEDANG DISERANG | CPU: 0% | Sisa RAM: 8.32MB / 32.00MB
+[2026-05-18 02:26:39] IP: xxx.xxx.xxx.2 | Aksi: BERHASIL DIBLOKIR | CPU: 0% | Sisa RAM: 8.32MB / 32.00MB
+[2026-05-18 02:26:43] IP: xxx.xxx.xxx.2 | Aksi: SEDANG DISERANG | CPU: 10% | Sisa RAM: 8.33MB / 32.00MB
+[2026-05-18 02:26:43] IP: xxx.xxx.xxx.2 | Aksi: BERHASIL DIBLOKIR | CPU: 10% | Sisa RAM: 8.33MB / 32.00MB
+^C
+(venv) user@user:~/TME-CORE$
+```

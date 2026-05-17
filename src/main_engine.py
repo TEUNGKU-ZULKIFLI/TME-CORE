@@ -1,6 +1,6 @@
 # ==========================================
 # FILE: src/main_engine.py
-# FUNGSI: Deteksi (A), Evaluasi (B), & Notifikasi
+# FUNGSI: Deteksi, Evaluasi, Notifikasi & Whitelist
 # ==========================================
 import re
 import time
@@ -13,8 +13,6 @@ from src.alert.notifier import send_telegram_alert
 failed_attempts = {}
 processed_log_ids = set()
 is_first_run = True
-
-# Variabel global untuk menyimpan beban router sementara
 last_cpu = 0
 last_ram = 0
 
@@ -33,7 +31,6 @@ def record_performance_data(api, attacker_ip, action_taken):
         free_memory = int(data.get('free-memory', 0)) / (1024 * 1024)
         total_memory = int(data.get('total-memory', 1)) / (1024 * 1024)
         
-        # Simpan ke variabel global untuk dikirim ke Telegram nanti
         last_cpu = cpu_load
         last_ram = free_memory
         
@@ -44,7 +41,7 @@ def record_performance_data(api, attacker_ip, action_taken):
             f.write(log_line)
         print(f"[*] DATA EVALUASI DISIMPAN: CPU {cpu_load}% | RAM sisa {free_memory:.2f}MB")
     except Exception as e:
-        print(f"[-] Gagal merekam data performa: {e}")
+        pass
 
 def process_engine(api):
     global failed_attempts, processed_log_ids, is_first_run, last_cpu, last_ram
@@ -70,6 +67,12 @@ def process_engine(api):
                 ip_attacker = extract_ip(message)
                 
                 if ip_attacker:
+                    # ---> FITUR BARU: CEK WHITELIST <---
+                    if ip_attacker in config.config.WHITELIST_IPS:
+                        print(f"[-] ABAIKAN: IP {ip_attacker} (Admin) salah password. Dilindungi oleh Whitelist.")
+                        processed_log_ids.add(log_id)
+                        continue # Langsung lompat ke log berikutnya (tidak dihitung sebagai ancaman)
+
                     failed_attempts[ip_attacker] = failed_attempts.get(ip_attacker, 0) + 1
                     print(f"[!] DETEKSI: Gagal login dari {ip_attacker} (Gagal ke-{failed_attempts[ip_attacker]})")
                     
@@ -78,15 +81,12 @@ def process_engine(api):
                     
                     if failed_attempts[ip_attacker] >= config.config.MAX_FAILED_ATTEMPTS:
                         print(f"[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada {ip_attacker}!")
-                        
                         sukses = block_ip(api, ip_attacker)
                         
                         if sukses:
                             record_performance_data(api, ip_attacker, "BERHASIL DIBLOKIR")
-                            # ---> EKSEKUSI FITUR TELEGRAM <---
                             print("[*] Menyiapkan pengiriman laporan ke Telegram...")
                             send_telegram_alert(ip_attacker, last_cpu, last_ram)
-                            
                             del failed_attempts[ip_attacker] 
             
             processed_log_ids.add(log_id)
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     api_conn, pool = connect_to_mikrotik()
     if api_conn:
         print("==================================================")
-        print("[-] TME-CORE AKTIF: Deteksi, Evaluasi, & Notifikasi")
+        print("[-] TME-CORE AKTIF: Deteksi, Evaluasi, Notifikasi & Whitelist")
         print("==================================================")
         try:
             while True:

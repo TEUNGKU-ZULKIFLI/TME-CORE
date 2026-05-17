@@ -12,6 +12,7 @@ Engine berbasis Python ini berjalan di server Debian, menganalisa log secara rea
 3. 🕵️‍♂️ [TAHAP 3: Jalur A - Mendeteksi log Brute Force](docs/tahap3.md)
 4. 👁️ [TAHAP 4: Jalur B - Menganalisa Beban Router (CPU Monitor)](docs/tahap4.md)
 5. ⚙️ [TAHAP 5: Menggabungkan Jalur A (Deteksi) & Jalur B (Evaluasi Kinerja)](docs/tahap5.md)
+6. 📩 [TAHAP 6: Mengirim Notifikasi ke Telegram](docs/tahap6.md)
 
 ---
 
