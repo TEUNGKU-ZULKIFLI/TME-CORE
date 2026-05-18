@@ -5,11 +5,11 @@
 import time
 import config.config
 from src.api.connection import connect_to_mikrotik, disconnect_from_mikrotik
+from src.cli.console import print_banner
 
 def check_router_load(api):
     """
     Mengambil data penggunaan CPU dan Memory dari MikroTik.
-    Sangat berguna untuk data Bab 4 (Evaluasi Kinerja).
     """
     try:
         # Ambil data dari /system/resource
@@ -53,6 +53,8 @@ def check_router_load(api):
 
 # --- Main Program Jalur B ---
 if __name__ == "__main__":
+    # EKSEKUSI TAMPILAN CLI PERTAMA KALI
+    print_banner()
     api_conn, pool = connect_to_mikrotik()
     if api_conn:
         print("[-] TME-CORE (JALUR B) AKTIF: Memonitor Beban Router...")

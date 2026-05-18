@@ -4,7 +4,9 @@
 # ==========================================
 import config.config
 from src.api.connection import connect_to_mikrotik, disconnect_from_mikrotik
+from src.cli.console import print_banner
 
+print_banner()
 api, pool = connect_to_mikrotik()
 if api:
     print("\n[*] Mengambil raw data log dari API MikroTik...")

@@ -4,6 +4,7 @@
 # ==========================================
 import config.config
 import routeros_api
+from src.cli.console import print_banner
 
 def connect_to_mikrotik():
     """
@@ -40,6 +41,7 @@ def disconnect_from_mikrotik(connection_pool):
 
 # --- Blok Testing (Hanya jalan jika file ini dieksekusi langsung) ---
 if __name__ == "__main__":
+    print_banner()
     print("Mencoba koneksi ke MikroTik...")
     api_conn, pool = connect_to_mikrotik()
     if api_conn:

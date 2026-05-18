@@ -1,10 +1,11 @@
 # ==========================================
 # FILE: src/main_engine.py
-# FUNGSI: Deteksi, Evaluasi, Notifikasi & Whitelist
+# FUNGSI: Orkestrator Utama TME-CORE
 # ==========================================
 import sys
 import os
-# Agar main_engine.py bisa mengenali folder 'config', 'src', dsb.
+
+# Header Setup Path Absolut (Sepuh Hack)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if BASE_DIR not in sys.path:
     sys.path.append(BASE_DIR)
@@ -12,10 +13,13 @@ if BASE_DIR not in sys.path:
 import re
 import time
 import datetime
+
+# Import dari folder src dan config
 from config import config
 from src.api.connection import connect_to_mikrotik, disconnect_from_mikrotik
 from src.firewall.mitigator_jalur_a import block_ip
 from src.alert.notifier import send_telegram_alert
+from src.cli.console import print_banner, run_doctor # IMPORT FITUR BARU
 
 failed_attempts = {}
 processed_log_ids = set()
@@ -33,7 +37,7 @@ def record_performance_data(api, attacker_ip, action_taken):
     try:
         resources = api.get_resource('/system/resource').get()
         if not resources: return
-            
+        
         data = resources[0]
         cpu_load = int(data.get('cpu-load', 0))
         free_memory = int(data.get('free-memory', 0)) / (1024 * 1024)
@@ -59,7 +63,7 @@ def process_engine(api):
         
         if is_first_run:
             for log in logs:
-                log_id = log.get('id') 
+                log_id = log.get('id')
                 if log_id: processed_log_ids.add(log_id)
             print(f"[*] Memori disiapkan. Mengabaikan {len(processed_log_ids)} log lama.")
             is_first_run = False
@@ -75,16 +79,14 @@ def process_engine(api):
                 ip_attacker = extract_ip(message)
                 
                 if ip_attacker:
-                    # FIX BUG SPAM: Jika IP sudah diblokir di sesi ini, abaikan sisa log-nya
                     if ip_attacker in session_blocked_ips:
                         processed_log_ids.add(log_id)
                         continue
 
-                    # FITUR WHITELIST
                     if ip_attacker in config.WHITELIST_IPS:
                         print(f"[-] ABAIKAN: IP {ip_attacker} (Admin) dilindungi Whitelist.")
                         processed_log_ids.add(log_id)
-                        continue 
+                        continue
 
                     failed_attempts[ip_attacker] = failed_attempts.get(ip_attacker, 0) + 1
                     print(f"[!] DETEKSI: Gagal login dari {ip_attacker} (Gagal ke-{failed_attempts[ip_attacker]})")
@@ -93,7 +95,7 @@ def process_engine(api):
                          record_performance_data(api, ip_attacker, "SEDANG DISERANG")
                     
                     if failed_attempts[ip_attacker] >= config.MAX_FAILED_ATTEMPTS:
-                        print(f"[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada {ip_attacker}!")
+                        print(f"\033[91m[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada {ip_attacker}!\033[0m")
                         sukses = block_ip(api, ip_attacker)
                         
                         if sukses:
@@ -101,9 +103,8 @@ def process_engine(api):
                             print("[*] Mengirim 1x laporan ke Telegram...")
                             send_telegram_alert(ip_attacker, last_cpu, last_ram)
                             
-                            # Masukkan ke sesi agar tidak dispam Telegramnya
                             session_blocked_ips.add(ip_attacker)
-                            del failed_attempts[ip_attacker] 
+                            del failed_attempts[ip_attacker]
             
             processed_log_ids.add(log_id)
             
@@ -111,16 +112,21 @@ def process_engine(api):
         print(f"[-] Error pada Main Engine: {e}")
 
 if __name__ == "__main__":
+    # EKSEKUSI TAMPILAN CLI PERTAMA KALI
+    print_banner()
+    run_doctor(config.ENV_PATH, config.DATA_DIR, config)
+    
+    # MEMULAI ENGINE
+    print("\033[93m[*] Mencoba koneksi ke RouterOS MikroTik...\033[0m")
     api_conn, pool = connect_to_mikrotik()
     if api_conn:
-        print("==================================================")
-        print("[-] TME-CORE AKTIF: V1.0 (Production Ready)")
-        print("==================================================")
+        print(f"\033[92m[+] TME-CORE Engine siap menahan serangan!\033[0m")
+        print("=" * 65)
         try:
             while True:
                 process_engine(api_conn)
                 time.sleep(3)
         except KeyboardInterrupt:
-            print("\n[*] Pemantauan dihentikan user.")
+            print("\n\033[93m[*] Proses dihentikan oleh user (Ctrl+C).\033[0m")
         finally:
             disconnect_from_mikrotik(pool)

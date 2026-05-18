@@ -16,19 +16,19 @@ else:
     print("[-] PERINGATAN: File .env tidak ditemukan. Sistem menggunakan nilai default!")
 
 # 1. Kredensial MikroTik (RouterBoard)
-MIKROTIK_IP = os.getenv("MIKROTIK_IP")
-MIKROTIK_USER = os.getenv("MIKROTIK_USER")
+MIKROTIK_IP = os.getenv("MIKROTIK_IP", "192.168.8.1")
+MIKROTIK_USER = os.getenv("MIKROTIK_USER", "admin")
 MIKROTIK_PASS = os.getenv("MIKROTIK_PASS")
 MIKROTIK_PORT = int(os.getenv("MIKROTIK_PORT", 8728))
 
 # 2. Threshold JALUR A (Pola Login)
-MAX_FAILED_ATTEMPTS = 5       
-BLOCK_TIMEOUT = "1h"          
+MAX_FAILED_ATTEMPTS = 5
+BLOCK_TIMEOUT = "1h"
 ADDRESS_LIST_NAME = "brute_force_block"
 
 # DAFTAR IP ADMIN/SERVER YANG KEBAL BLOKIR (Tidak akan pernah diblokir)
 # Tambahkan IP Debian kamu atau IP Laptop Windows kamu di sini
-whitelist_str = os.getenv("WHITELIST_IPS")
+whitelist_str = os.getenv("WHITELIST_IPS", "127.0.0.1")
 WHITELIST_IPS = [ip.strip() for ip in whitelist_str.split(',')]
 
 # 3. Threshold JALUR B (Beban Router)
@@ -36,8 +36,8 @@ MAX_CPU_USAGE = 80            # Batas toleransi CPU (%) sebelum alarm berbunyi
 MAX_RAM_USAGE = 90            # Batas toleransi RAM (%) (Opsional)
 
 # 4. Kredensial Bot Telegram
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 
 # 5. Konfigurasi Direktori Log Evaluasi Skripsi
 DATA_DIR = os.path.join(BASE_DIR, "data")
