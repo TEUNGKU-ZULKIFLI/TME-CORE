@@ -2,7 +2,7 @@
 # FILE: src/api/connection.py
 # FUNGSI: Jembatan komunikasi ke RouterOS
 # ==========================================
-import config.config
+from config import config
 import routeros_api
 from src.cli.console import print_banner
 
@@ -14,18 +14,18 @@ def connect_to_mikrotik():
     try:
         # Inisialisasi parameter koneksi
         connection = routeros_api.RouterOsApiPool(
-            config.config.MIKROTIK_IP,
-            username=config.config.MIKROTIK_USER,
-            password=config.config.MIKROTIK_PASS,
-            port=config.config.MIKROTIK_PORT,
+            config.MIKROTIK_IP,
+            username=config.MIKROTIK_USER,
+            password=config.MIKROTIK_PASS,
+            port=config.MIKROTIK_PORT,
             plaintext_login=True
         )
-        
+
         # Eksekusi koneksi
         api = connection.get_api()
-        print(f"[+] SUKSES: Terhubung ke MikroTik {config.config.MIKROTIK_IP}")
+        print(f"[+] SUKSES: Terhubung ke MikroTik {config.MIKROTIK_IP}")
         return api, connection
-        
+
     except Exception as e:
         print(f"[-] GAGAL KONEKSI: Pastikan API MikroTik aktif (/ip services enable api)")
         print(f"[-] Error Log: {e}")

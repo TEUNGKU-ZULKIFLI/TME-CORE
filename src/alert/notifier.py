@@ -3,45 +3,57 @@
 # FUNGSI: Mengirim Notifikasi ke Telegram
 # ==========================================
 import requests
-import config.config
+from config import config
 
 def send_telegram_alert(ip_attacker, cpu_load, sisa_ram):
     """
-    Fungsi untuk menembak API Telegram Bot.
-    Akan dipanggil oleh Main Engine setelah pemblokiran berhasil.
+    Mengirimkan pesan peringatan mitigasi otomatis dengan visualisasi
+    yang kontras dan terstruktur menggunakan parsing HTML.
     """
-    # Cek apakah token sudah diisi
-    if not config.config.TELEGRAM_TOKEN or not config.config.TELEGRAM_CHAT_ID:
-        print("[-] NOTIFIKASI: Batal kirim. Token Telegram belum di-setting di config.config.py")
+    if not config.TELEGRAM_TOKEN or not config.TELEGRAM_CHAT_ID:
+        print("[-] NOTIFIKASI: Token Telegram atau Chat ID belum dikonfigurasi.")
         return False
-        
-    # Format Pesan yang akan masuk ke HP kamu
+
+    # Desain visualisasi indikator beban CPU menggunakan Emoji Meter
+    cpu_bar = "🟢"
+    if cpu_load >= 80:
+        cpu_bar = "🔴 (CRITICAL)"
+    elif cpu_load >= 50:
+        cpu_bar = "🟡 (WARNING)"
+
+    # Format Pesan HTML yang Estetis
     pesan = (
-        f"🚨 <b>TME-CORE ALERT: BRUTE FORCE DIBLOKIR!</b> 🚨\n\n"
-        f"🛡️ <b>IP Penyerang:</b> <code>{ip_attacker}</code>\n"
-        f"⚙️ <b>Beban CPU Saat Diserang:</b> {cpu_load}%\n"
-        f"💾 <b>Sisa RAM:</b> {sisa_ram:.2f} MB\n"
-        f"✅ <b>Status:</b> IP telah dimasukkan ke Blacklist Firewall MikroTik."
+        f"<b>🛡️ TME-CORE SYSTEM ALERT</b>\n"
+        f"<i>Automated Intrusion Prevention Active</i>\n"
+        f"───────────────────────────\n\n"
+        f"🚨 <b>SERANGAN BRUTE FORCE DIBLOKIR!</b>\n"
+        f"📌 <b>IP Penyerang :</b> <code>{ip_attacker}</code>\n"
+        f"⚡ <b>Status Aksi   :</b> <code>DROP (Blacklisted)</code>\n\n"
+        f"📊 <b>METRIK SUMBER DAYA ROUTER:</b>\n"
+        f"  ├─ Beban CPU : {cpu_load}% {cpu_bar}\n"
+        f"  └─ Sisa RAM  : {sisa_ram:.2f} MB / 32.00 MB\n\n"
+        f"───────────────────────────\n"
+        f"📅 <i>Dilaporkan secara real-time oleh TME Engine</i>"
     )
-    
+
     # URL API Telegram
-    url = f"https://api.telegram.org/bot{config.config.TELEGRAM_TOKEN}/sendMessage"
-    
+    url = f"https://api.telegram.org/bot{config.TELEGRAM_TOKEN}/sendMessage"
+
     # Payload
     payload = {
-        "chat_id": config.config.TELEGRAM_CHAT_ID,
+        "chat_id": config.TELEGRAM_CHAT_ID,
         "text": pesan,
         "parse_mode": "HTML"
     }
-    
+
     try:
         response = requests.post(url, data=payload, timeout=5)
         if response.status_code == 200:
             print("[+] NOTIFIKASI: Pesan peringatan berhasil dikirim ke Telegram!")
             return True
         else:
-            print(f"[-] GAGAL NOTIFIKASI: Error dari Telegram -> {response.text}")
+            print(f"[-] GAGAL NOTIFIKASI: Telegram API Return -> {response.text}")
             return False
     except Exception as e:
-        print(f"[-] GAGAL NOTIFIKASI: Tidak ada koneksi internet / Error -> {e}")
+        print(f"[-] GAGAL NOTIFIKASI: Masalah koneksi jaringan ke API Telegram -> {e}")
         return False

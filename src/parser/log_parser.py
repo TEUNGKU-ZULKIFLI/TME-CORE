@@ -2,7 +2,6 @@
 # FILE: src/parser/log_parser.py
 # FUNGSI: Pengecekan Raw Data Log MikroTik
 # ==========================================
-import config.config
 from src.api.connection import connect_to_mikrotik, disconnect_from_mikrotik
 from src.cli.console import print_banner
 
