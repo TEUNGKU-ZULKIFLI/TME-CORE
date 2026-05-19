@@ -280,7 +280,7 @@ Dan menerima pesan Bot Telegram dengan berikut ini:
 ✅ Status: IP telah dimasukkan ke Blacklist Firewall MikroTik.
 ```
 Dengan by Visual:</br>
-<img src="/assets/imgs/UI-Mesaage.png" width="600"/>
+<img src="/assets/images/UI-Mesaage.png" width="600"/>
 
 Kemudian closing engine cukup ketik **`Ctrl + c`**:
 ```bash

@@ -1,29 +1,31 @@
-# 🚀 TME-CORE: MikroTik Threat Mitigation Engine
+<p align="center">
+    <picture>
+      <source media="(prefers-color-scheme: light)" srcset="./assets/logos/TME-banner.png" />
+      <img src="./assets/logos/TME-banner.png" />
+  </picture>
+</p>
+<h1 align="center">
+  <span>TME-CORE</span>
+  <br align="center">Teungku Mitigation Engine - Core</br>
+</h1>
+<h3 align="center">
+  <a href="./docs/getting_started.md">🚀 Getting Starting</a>
+  <span> · </span>
+  <a href="./docs/all-tahapan.md">📑 Documentation</a>
+  <span> · </span>
+  <a href="#-apa-itu-tme-core">ℹ️ Apa itu TME-CORE</a>
+  <span> · </span>
+  <a href="#-cara-kerja-tme-core">🛠️ Cara Kerja TME-CORE</a>
+  <span> · </span>
+  <a href="#-fitur-utama">✨ Fitur Utama</a>
+  <span> · </span>
+  <a href="#-tujuan">🎯 Tujuan</a>
+</h3>
 
-> **Deskripsi Singkat**  </br>
-TME-CORE adalah sistem otomatis untuk mitigasi serangan Brute Force SSH/FTP pada Router MikroTik.
-Engine berbasis Python ini berjalan di server Debian, menganalisa log secara real-time, mendeteksi anomali, dan melakukan blocking otomatis via API RouterOS dengan latency < 5 detik. ⚡
+## ℹ️ Apa itu TME-CORE
 
----
-
-## 📚 Tahapan Setup
-1. 🛠️ [TAHAP 1: Jembatan komunikasi ke RouterOS](docs/tahap1.md)
-2. 📡 [TAHAP 2: Pengecekan Raw Data Log MikroTik](docs/tahap2.md)
-3. 🕵️‍♂️ [TAHAP 3: Jalur A - Mendeteksi log Brute Force](docs/tahap3.md)
-4. 👁️ [TAHAP 4: Jalur B - Menganalisa Beban Router (CPU Monitor)](docs/tahap4.md)
-5. ⚙️ [TAHAP 5: Menggabungkan Jalur A (Deteksi) & Jalur B (Evaluasi Kinerja)](docs/tahap5.md)
-6. 📩 [TAHAP 6: Mengirim Notifikasi ke Telegram](docs/tahap6.md)
-7. 🕐 [TAHAP 7: Menjadikan TME-CORE Berjalan di Background (Systemd)](docs/tahap7.md)
-
----
+## 🛠️ Cara Kerja TME-CORE
 
 ## ✨ Fitur Utama
-- 🔍 Analisis log real-time
-- 🛡️ Deteksi anomali brute force
-- ⚡ Blocking otomatis < 5 detik
-- 🔗 Integrasi langsung dengan RouterOS API
-
----
 
 ## 🎯 Tujuan
-Memberikan perlindungan ekstra pada Router MikroTik dengan cara yang **ringan, cepat, dan fun** untuk sysadmin yang ingin tidur lebih nyenyak 😴.
