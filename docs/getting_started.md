@@ -1,7 +1,7 @@
 <p align="center">
     <picture>
-      <source media="(prefers-color-scheme: light)" srcset="./assets/logos/TME-banner.png" />
-      <img src="./assets/logos/TME-banner.png" />
+      <source media="(prefers-color-scheme: light)" srcset="../assets/logos/TME-logo01.png" />
+      <img src="../assets/logos/TME-logo01.png" />
   </picture>
 </p>
 <h1 align="center">
