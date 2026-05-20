@@ -1,9 +1,14 @@
-# TME-CORE: MikroTik Threat Mitigation Engine
-> **Deskripsi**:</br>
-Sistem mitigasi otomatis serangan Brute Force SSH/FTP pada Router MikroTik dengan engine eksternal berbasis Python. Engine berjalan di server Debian dan menganalisa log secara real-time, mendeteksi anomali, dan melakukan blocking otomatis via API RouterOS dengan latency < 5 detik.
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: night)" srcset="../assets/logos/TME-logo01.png" />
+    <img src="../assets/logos/TME-logo01.png" width="500" />
+  </picture>
+</p>
+<h1 align="center">
+  <span><b align="center">🧑‍💻 TAHAP: Mengirim Notifikasi ke Telegram</b></span>
+</h1>
 
-### 🧑‍💻 TAHAP: Mengirim Notifikasi ke Telegram
-> **Deskripsi**:</br>
+**Deskripsi**:</br>
 Menyetup sebuah Bot untuk memberitahukan bahwa IP penyerang sudah terblokir nih!
 
 > [!WARNING]
@@ -280,7 +285,9 @@ Dan menerima pesan Bot Telegram dengan berikut ini:
 ✅ Status: IP telah dimasukkan ke Blacklist Firewall MikroTik.
 ```
 Dengan by Visual:</br>
-<img src="/assets/images/UI-Mesaage.png" width="600"/>
+<p align="center">
+  <img src="../assets/images/UI-Mesaage.png" width="600"/>
+</p>
 
 Kemudian closing engine cukup ketik **`Ctrl + c`**:
 ```bash

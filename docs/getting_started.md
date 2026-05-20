@@ -1,11 +1,11 @@
 <p align="center">
-    <picture>
-      <source media="(prefers-color-scheme: light)" srcset="../assets/logos/TME-logo01.png" />
-      <img src="../assets/logos/TME-logo01.png" />
+  <picture>
+    <source media="(prefers-color-scheme: night)" srcset="../assets/logos/TME-logo01.png" />
+    <img src="../assets/logos/TME-logo01.png" width="500" />
   </picture>
 </p>
 <h1 align="center">
-  <span>🚀 Getting Started with TME-CORE</span>
+  <span><b>🚀 Getting Started with TME-CORE</b></span>
 </h1>
 <p align="center">
 <span align="center">Selamat datang di panduan penggunaan <b>Teungku Mitigation Engine - Core (TME-CORE)</b>. Panduan ini akan memandu Anda langkah demi langkah untuk menghubungkan sistem deteksi ini dengan Router MikroTik Anda.</span>
