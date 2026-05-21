@@ -76,3 +76,11 @@ user@user:~/TME-CORE$ source venv/bin/activate
 [*] Koneksi ke MikroTik ditutup dengan aman.
 (venv) user@user:~/TME-CORE$ 
 ```
+<p align=right>
+<a href="./tahap3.md#--%E2%80%8D-tahap-jalur-a---mendeteksi-log-brute-force">
+  <img src="https://img.shields.io/badge/🔙-BACK-red?style=for-the-badge" />
+</a>
+<a href="./tahap5.md#--%E2%80%8D-tahap-menggabungkan-jalur-a-deteksi--jalur-b-evaluasi-kinerja">
+  <img src="https://img.shields.io/badge/🔜-SOON-green?style=for-the-badge" />
+</a>
+</p>

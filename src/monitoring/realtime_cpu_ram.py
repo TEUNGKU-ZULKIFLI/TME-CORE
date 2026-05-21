@@ -14,28 +14,28 @@ def check_router_load(api):
     try:
         # Ambil data dari /system/resource
         resources = api.get_resource('/system/resource').get()
-        
+
         if not resources:
             return None
-            
+
         # Ekstrak data mentah
         data = resources[0]
         cpu_load = int(data.get('cpu-load', 0))
         free_memory = int(data.get('free-memory', 0))
         total_memory = int(data.get('total-memory', 1)) # Hindari devide by zero
-        
+
         # Kalkulasi persentase RAM yang terpakai
         used_memory = total_memory - free_memory
         ram_usage_percent = int((used_memory / total_memory) * 100)
-        
+
         # --- LOGIKA JALUR B ---
         print(f"[*] BEBAN ROUTER -> CPU: {cpu_load}% | RAM: {ram_usage_percent}%")
-        
+
         # Jika CPU melonjak drastis akibat Brute Force atau hal mencurigakan
         if cpu_load >= config.MAX_CPU_USAGE:
             print(f"[!!!] PERINGATAN: CPU Overload ({cpu_load}%)!")
             print("[!] Indikasi serangan masif atau aktivitas anomali sedang terjadi.")
-            
+
             active_users = api.get_resource('/user/active').get()
             if active_users:
                 print("    Daftar User yang sedang login saat ini:")
@@ -43,9 +43,9 @@ def check_router_load(api):
                     print(f"    -> User: {u.get('name')} | IP: {u.get('address')} | Via: {u.get('via')}")
             else:
                 print("    Tidak ada user aktif terdeteksi (Kemungkinan murni serangan dari luar).")
-                
+
         return cpu_load, ram_usage_percent
-        
+
     except Exception as e:
         print(f"[-] Error saat membaca system resource: {e}")
         return None, None

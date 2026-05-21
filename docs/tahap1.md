@@ -120,3 +120,11 @@ Mencoba koneksi ke MikroTik...
 [*] Koneksi ke MikroTik ditutup dengan aman.
 (venv) user@user:~/TME-CORE$
 ```
+<p align=right>
+<a href="./all-tahap.md#--teungku-mitigation-engine---core">
+  <img src="https://img.shields.io/badge/🏁-MAIN-red?style=for-the-badge" />
+</a>
+<a href="./tahap2.md#--%E2%80%8D-tahap-pengecekan-raw-data-log-mikrotik">
+  <img src="https://img.shields.io/badge/🔜-SOON-green?style=for-the-badge" />
+</a>
+</p>

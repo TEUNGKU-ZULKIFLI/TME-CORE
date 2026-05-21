@@ -289,3 +289,11 @@ user@user:~/TME-CORE$ source venv/bin/activate
 ^C
 (venv) user@user:~/TME-CORE$
 ```
+<p align=right>
+<a href="./tahap4.md#--%E2%80%8D-tahap-jalur-b---menganalisa-beban-router-cpu-monitor">
+  <img src="https://img.shields.io/badge/🔙-BACK-red?style=for-the-badge" />
+</a>
+<a href="./tahap6.md#--%E2%80%8D-tahap-mengirim-notifikasi-ke-telegram">
+  <img src="https://img.shields.io/badge/🔜-SOON-green?style=for-the-badge" />
+</a>
+</p>

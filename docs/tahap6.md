@@ -419,3 +419,11 @@ user@user:~/TME-CORE$ source venv/bin/activate
 ^C
 (venv) user@user:~/TME-CORE$
 ```
+<p align=right>
+<a href="./tahap5.md#--%E2%80%8D-tahap-menggabungkan-jalur-a-deteksi--jalur-b-evaluasi-kinerja">
+  <img src="https://img.shields.io/badge/🔙-BACK-red?style=for-the-badge" />
+</a>
+<a href="./tahap7.md#--%E2%80%8D-tahap-menjadikan-tme-core-berjalan-di-background-systemd">
+  <img src="https://img.shields.io/badge/🔜-SOON-green?style=for-the-badge" />
+</a>
+</p>

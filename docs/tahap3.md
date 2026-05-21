@@ -294,3 +294,11 @@ Flags: X - disabled, D - dynamic
 > > [*] [DEBUG] Mengambil 22 log dari MikroTik...
 > > [*] [DEBUG] Mengambil 22 log dari MikroTik...
 > > ```
+<p align=right>
+<a href="./tahap2.md#--%E2%80%8D-tahap-pengecekan-raw-data-log-mikrotik">
+  <img src="https://img.shields.io/badge/🔙-BACK-red?style=for-the-badge" />
+</a>
+<a href="./tahap4.md#--%E2%80%8D-tahap-jalur-b---menganalisa-beban-router-cpu-monitor">
+  <img src="https://img.shields.io/badge/🔜-SOON-green?style=for-the-badge" />
+</a>
+</p>

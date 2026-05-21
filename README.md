@@ -10,7 +10,8 @@
 <p align="center">
   🚀 <a href="./docs/getting_started.md">Getting Started</a> · 
   📑 <a href="./docs/all-tahap.md">Documentation</a> · 
-  ❓ <a href="#apa-itu">Apa itu TME-CORE</a> · 
+  ⌨️ <a href="./docs/basic_cli.md">Basic CLI</a> · 
+  <!-- ❓ <a href="#apa-itu">Apa itu TME-CORE</a> · 
   ⚙️ <a href="#cara-kerja">Cara Kerja</a> · 
   ✨ <a href="#fitur-utama">Fitur Utama</a> · 
   💻 <a href="#persyaratan-sistem">Persyaratan Sistem</a> · 
@@ -21,7 +22,7 @@
   🎯 <a href="#tujuan">Tujuan</a> · 
   👤 <a href="#kontribusi">Kontribusi</a> · 
   ⚖️ <a href="#lisensi">Lisensi</a> · 
-  📞 <a href="#kontak-support">Kontak / Support</a>
+  📞 <a href="#kontak-support">Kontak / Support</a> -->
 </p>
 
 ---

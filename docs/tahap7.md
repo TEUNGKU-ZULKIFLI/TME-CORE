@@ -87,3 +87,11 @@ sudo systemctl status tmecore.service
 ```bash
 sudo journalctl -u tmecore.service -f
 ```
+<p align=right>
+<a href="./tahap6.md#--%E2%80%8D-tahap-mengirim-notifikasi-ke-telegram">
+  <img src="https://img.shields.io/badge/🔙-BACK-red?style=for-the-badge" />
+</a>
+<a href="./all-tahap.md#--teungku-mitigation-engine---core">
+  <img src="https://img.shields.io/badge/🏁-MAIN-green?style=for-the-badge" />
+</a>
+</p>

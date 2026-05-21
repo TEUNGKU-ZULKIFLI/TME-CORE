@@ -7,3 +7,7 @@
 <h1 align="center">
   <span><b align="center">🗑️ UNINSTALLASI with TME-CORE</b></span>
 </h1>
+
+## Quick Guide
+
+## Manual Guide
