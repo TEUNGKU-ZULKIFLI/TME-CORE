@@ -24,6 +24,8 @@ sudo rm -rf /etc/systemd/system/tmecore.service &&
 sudo systemctl daemon-reload &&
 # Validasi Engine Service
 sudo systemctl status tmecore.service &&
+# Vacum log
+sudo journalctl --unit=tmecore.service --vacuum-time=1s
 
 echo "████████╗███╗   ███╗███████╗     ██████╗ ██████╗ ██████╗ ███████╗"
 echo "╚══██╔══╝████╗ ████║██╔════╝    ██╔════╝██╔═══██╗██╔══██╗██╔════╝"
