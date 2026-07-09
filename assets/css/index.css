@@ -1,0 +1,71 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  background: #1e1e2f;   /* abu tua */
+  color: #e0e0e0;        /* teks terang */
+}
+
+header {
+  background: #2a2a3d;   /* header lebih gelap */
+  border-bottom: 1px solid #444;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+nav {
+  max-width: 960px;
+  margin: auto;
+  display: flex;
+  gap: 1rem;
+  padding: 0.8rem;
+}
+
+nav a {
+  text-decoration: none;
+  color: #e0e0e0;
+  font-weight: 500;
+}
+
+nav a:hover {
+  color: #4da6ff;        /* aksen biru */
+}
+
+main {
+  max-width: 960px;
+  margin: auto;
+  padding: 1rem;
+}
+
+section {
+  margin: 2rem 0;
+}
+
+h2 {
+  border-bottom: 1px solid #444;
+  padding-bottom: 0.3rem;
+  color: #ffffff;
+}
+
+h3 {
+  margin-top: 1.5rem;
+  color: #cfcfcf;
+}
+
+.cast-player {
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background: #2a2a3d;   /* kotak cast */
+  border: 1px solid #444;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: #aaa;
+  background: #2a2a3d;
+  border-top: 1px solid #444;
+}
