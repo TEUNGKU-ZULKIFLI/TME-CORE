@@ -19,6 +19,7 @@ from src.alert.notifier import send_telegram_alert
 from src.cli.console import print_banner, run_doctor
 from src.monitoring.evaluator_jalur_b import record_performance_to_csv
 from src.db.state_manager import load_state, save_state
+from src.detection.detector_jalur_b import check_active_session_anomalies
 
 failed_attempts, session_blocked_ips = load_state()
 processed_log_ids = set()
@@ -105,8 +106,8 @@ def process_engine(api):
                             del failed_attempts[ip_attacker]
 
                             save_state(failed_attempts, session_blocked_ips)
-
             processed_log_ids.add(log_id)
+            check_active_session_anomalies(api, failed_attempts, session_blocked_ips)
 
     except Exception as e:
         print(f"[-] Error pada Main Engine: {e}")

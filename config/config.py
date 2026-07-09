@@ -35,9 +35,6 @@ ADDRESS_LIST_NAME = "brute_force_block"
 MAX_CPU_USAGE = 80
 MAX_RAM_USAGE = 90
 
-# =========================================================
-# ARSITEKTUR STRUKTUR DATA BARU (STANDAR INDUSTRI)
-# =========================================================
 DATA_DIR = os.path.join(BASE_DIR, "data")
 DB_DIR = os.path.join(DATA_DIR, "db")
 LOGS_DIR = os.path.join(DATA_DIR, "logs")

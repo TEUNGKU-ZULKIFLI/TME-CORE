@@ -49,8 +49,7 @@ def save_state(failed_attempts, session_blocked_ips):
         os.makedirs(os.path.dirname(config.config.STATE_DB_PATH), exist_ok=True)
 
         with open(config.config.STATE_DB_PATH, 'w', encoding='utf-8') as f:
-            # indent=4 agar file JSON nya rapi dan mudah dibaca manusia
             json.dump(data, f, indent=4)
 
     except Exception as e:
-        pass # Diamkan saja jika error agar tidak mengganggu proses utama
+        pass

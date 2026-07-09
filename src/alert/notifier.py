@@ -5,41 +5,43 @@
 import requests
 from config import config
 
-def send_telegram_alert(ip_attacker, cpu_load, sisa_ram):
+def send_telegram_alert(ip_attacker, cpu_load, sisa_ram, custom_message=None):
     """
     Mengirimkan pesan peringatan mitigasi otomatis dengan visualisasi
     yang kontras dan terstruktur menggunakan parsing HTML.
+    Mendukung pengiriman pesan kustom untuk anomali Jalur B.
     """
     if not config.TELEGRAM_TOKEN or not config.TELEGRAM_CHAT_ID:
         print("[-] NOTIFIKASI: Token Telegram atau Chat ID belum dikonfigurasi.")
         return False
 
-    # Desain visualisasi indikator beban CPU menggunakan Emoji Meter
-    cpu_bar = "🟢"
-    if cpu_load >= 80:
-        cpu_bar = "🔴 (CRITICAL)"
-    elif cpu_load >= 50:
-        cpu_bar = "🟡 (WARNING)"
+    # Jika ada pesan kustom (seperti alert anomali Jalur B), langsung gunakan pesan tersebut
+    if custom_message:
+        pesan = custom_message
+    else:
+        # Desain visualisasi indikator beban CPU menggunakan Emoji Meter
+        cpu_bar = "🟢"
+        if cpu_load >= 80:
+            cpu_bar = "🔴 (CRITICAL)"
+        elif cpu_load >= 50:
+            cpu_bar = "🟡 (WARNING)"
 
-    # Format Pesan HTML yang Estetis
-    pesan = (
-        f"<b>🛡️ TME-CORE SYSTEM ALERT</b>\n"
-        f"<i>Automated Intrusion Prevention Active</i>\n"
-        f"───────────────────────────\n\n"
-        f"🚨 <b>SERANGAN BRUTE FORCE DIBLOKIR!</b>\n"
-        f"📌 <b>IP Penyerang :</b> <code>{ip_attacker}</code>\n"
-        f"⚡ <b>Status Aksi   :</b> <code>DROP (Blacklisted)</code>\n\n"
-        f"📊 <b>METRIK SUMBER DAYA ROUTER:</b>\n"
-        f"  ├─ Beban CPU : {cpu_load}% {cpu_bar}\n"
-        f"  └─ Sisa RAM  : {sisa_ram:.2f} MB / 32.00 MB\n\n"
-        f"───────────────────────────\n"
-        f"📅 <i>Dilaporkan secara real-time oleh TME Engine</i>"
-    )
+        # Format Pesan HTML yang Estetis (Default)
+        pesan = (
+            f"<b>🛡️ TME-CORE SYSTEM ALERT</b>\n"
+            f"<i>Automated Intrusion Prevention Active</i>\n"
+            f"───────────────────────────\n\n"
+            f"🚨 <b>SERANGAN BRUTE FORCE DIBLOKIR!</b>\n"
+            f"📌 <b>IP Penyerang :</b> <code>{ip_attacker}</code>\n"
+            f"⚡ <b>Status Aksi   :</b> <code>DROP (Blacklisted)</code>\n\n"
+            f"📊 <b>METRIK SUMBER DAYA ROUTER:</b>\n"
+            f"  ├─ Beban CPU : {cpu_load}% {cpu_bar}\n"
+            f"  └─ Sisa RAM  : {sisa_ram:.2f} MB / 32.00 MB\n\n"
+            f"───────────────────────────\n"
+            f"📅 <i>Dilaporkan secara real-time oleh TME Engine</i>"
+        )
 
-    # URL API Telegram
     url = f"https://api.telegram.org/bot{config.TELEGRAM_TOKEN}/sendMessage"
-
-    # Payload
     payload = {
         "chat_id": config.TELEGRAM_CHAT_ID,
         "text": pesan,
