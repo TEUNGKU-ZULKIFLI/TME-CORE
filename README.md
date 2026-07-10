@@ -1,148 +1,164 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: night)" srcset="./assets/logos/TME-logo01.png" />
-    <img src="./assets/logos/TME-logo01.png" width="500" />
-  </picture>
-</p>
 <h1 align="center">
   <span><b align="center">TEUNGKU MITIGATION ENGINE - Core</b></span>
 </h1>
 <p align="center">
-  🚀 <a href="./docs/getting_started.md">Getting Started</a> · 
-  📑 <a href="./docs/all-tahap.md">Documentation</a> · 
-  ⌨️ <a href="./docs/basic_cli.md">Basic CLI</a> · 
-  <!-- ❓ <a href="#apa-itu">Apa itu TME-CORE</a> · 
-  ⚙️ <a href="#cara-kerja">Cara Kerja</a> · 
-  ✨ <a href="#fitur-utama">Fitur Utama</a> · 
-  💻 <a href="#persyaratan-sistem">Persyaratan Sistem</a> · 
-  📥 <a href="#installasi">Installasi</a> · 
-  🚀 <a href="#panduan-cepat">Panduan Cepat</a> · 
-  🗑️ <a href="#uninstallasi">Uninstallasi</a> · 
-  🔧 <a href="#troubleshooting">Troubleshooting</a> · 
-  🎯 <a href="#tujuan">Tujuan</a> · 
-  👤 <a href="#kontribusi">Kontribusi</a> · 
-  ⚖️ <a href="#lisensi">Lisensi</a> · 
-  📞 <a href="#kontak-support">Kontak / Support</a> -->
+<a href="./docs/install.md">
+  <img src="https://img.shields.io/badge/📥-Install-green?style=for-the-badge" />
+</a>
+<a href="./docs/getting_started.md">
+  <img src="https://img.shields.io/badge/🚀-Getting%20Started-blue?style=for-the-badge" />
+</a>
+<a href="./docs/uninstall.md">
+  <img src="https://img.shields.io/badge/🗑️-Uninstall-red?style=for-the-badge" />
+</a>
+<a href="./docs/troubleshooting.md">
+  <img src="https://img.shields.io/badge/🔧-Troubleshooting-orange?style=for-the-badge" />
+</a>
 </p>
 
 ---
 
-## Apa itu?
-**`TME-CORE`** adalah sistem mitigasi otomatis untuk serangan **Brute Force SSH/FTP** pada Router MikroTik.
-Engine berbasis **Python** ini berjalan di server Debian, menganalisa log secara real-time, mendeteksi anomali, dan melakukan blocking otomatis via API RouterOS dengan latency `< 5 detik` ⚡.
+## TME-CORE (Teungku Mitigation Engine - Core)
+**TME-CORE** (*Teungku Mitigation Engine - Core*) adalah sebuah mesin mitigasi keamanan otonom berbasis External Controller (Python) yang dirancang untuk melindungi fungsionalitas Control Plane router MikroTik dari ancaman serangan brute force SSH (Port 22) dan FTP (Port 21).
 
-## Cara Kerja
+Proyek ini dibangun sebagai bagian dari penelitian tugas akhir/skripsi pada program studi **Teknologi Rekayasa Komputer Jaringan, Politeknik Negeri Lhokseumawe**.
+
+## 💡 Kenapa Proyek Ini Penting & Berguna?
+Pada perangkat jaringan tingkat tepi (*edge router*) dengan sumber daya terbatas (seperti MikroTik hAP lite / `RB941-2nD-TC`), memproses serangan *brute force* masif yang bertubi-tubi akan menyiksa CPU hingga mencapai **utilitas puncak 100%**. Skenario tanpa mitigasi ini berakibat fatal:</br>
+1. Router menjadi **sangat lambat** (*severe lag*), tidak responsif, dan paket-paket data penting mengalami gangguan.</br>
+2. Memaksa prosesor bekerja keras dalam jangka panjang memicu *hardware stress* dan **system crash** (kelumpuhan total).</br>
+3. Melakukan analisis log di dalam router menggunakan *internal scripting* bawaan RouterOS justru memperburuk utilisasi CPU router itu sendiri.
+
+### Solusi TME-CORE: *Offloading Processing*
+TME-CORE memecahkan masalah ini dengan memindahkan beban kerja komputasi analitik (*offloading processing*) keluar dari router menuju server Linux (Debian) menggunakan protokol **API port 8728**.</br>
+- **Jalur A (Signature Block):** Melakukan polling data log secara cepat, mendeteksi kegagalan, mengekstrak IP via *Regex*, dan memerintahkan router memblokir penyerang via *Firewall Address-List* (Aturan Drop ringan).</br>
+- **Jalur B (Active Session Guard):** Mengawasi celah bypass otentikasi. Jika penyerang berhasil masuk (*login success*) pasca rentetan kegagalan, sistem memutus paksa sesi aktif (*session kick*) via *script injection* v6.x / API v7.x dan mengisolasi IP-nya seketika.
+
+## 🗺️ Arsitektur Aliran Data
 ```mermaid
-graph TB
-    %% Subgraph grouping
-    subgraph Attacker
-        hacker[<b/>Hydra]
-    end
+flowchart TD
+    Attacker["KALI LINUX (Attacker)"]
+    MikroTik["MIKROTIK ROUTEROS"]
+    Debian["DEBIAN SERVER (Host)\n*TME-CORE ENGINE*"]
+    StateDB["tme_state.json"]
+    Telegram["TELEGRAM API BOT"]
+    Admin["HP ADMIN (Smartphone)"]
 
-    subgraph Defense
-        router[<b/>MikroTik RouterOS]
-        server[<b/>Debian Server]
-        engine[<b/>TME Core Service]
-    end
-
-    subgraph Notification
-        bot[<b/>Bot Telegram]
-    end
-
-    %% Flow
-    hacker -- 🔴 SSH/FTP brute force --> router
-    router -- 🔗 API port 8728 --> server
-    server -- ⚙️ Activate 24/7 --> engine
-    engine -- ⚠️ Threshold reached --> router
-    engine -- 🛡️ Blocked attacker --> hacker
-    engine -- 🔔 Send notif --> bot
-
-    %% Node styling
-    style hacker fill:#cc0000,stroke:#660000,stroke-width:2px,color:#ffffff
-    style router fill:#33cc33,stroke:#006600,stroke-width:2px,color:#ffffff
-    style server fill:#cccccc,stroke:#666666,stroke-width:1.5px,color:#000000
-    style engine fill:#ffcc00,stroke:#cc9900,stroke-width:2px,color:#000000
-    style bot fill:#3399ff,stroke:#0066cc,stroke-width:2px,color:#ffffff
-
-    %% Subgraph styling
-    style Attacker fill:#ffe5e5,stroke:#cc0000,color:#000000
-    style Defense fill:#f9f9f9,stroke:#999999,color:#000000
-    style Notification fill:#e5f0ff,stroke:#0066cc,color:#000000
+    Attacker -->|"Injeksi Brute Force"| MikroTik
+    MikroTik -->|"API Session TCP 8728"| Debian
+    Debian <--> StateDB
+    Debian -->|"API HTTPS Notifikasi"| Telegram
+    Telegram -->|"Push Notification"| Admin
 ```
-**Narasi alur**:
-- **Attacker** mencoba brute force ke port SSH/FTP router.
-- **Router** meneruskan log ke server.
-- **Server** menjalankan TME-Core 24 jam nonstop.
-- **Engine** mendeteksi percobaan gagal, menunggu hingga mencapai threshold.
-- Jika threshold tercapai, engine mengirim perintah blokir ke router dan feedback ke attacker.
-- Engine juga mengirim **notifikasi** ke Bot Telegram bahwa serangan berhasil ditangani.
 
-## Fitur Utama
-- 🔎 Analisis log real-time
-- 🛡️ Deteksi brute force otomatis
-- ⚡ Blocking cepat via API
-- 🔗 Integrasi langsung dengan RouterOS
-- 📨 Pesan dari Bot Telegram
+## 🚀 Bagaimana Saya Memulainya?
+Ikuti panduan langkah demi langkah di bawah ini untuk memasang dan menjalankan TME-CORE di lingkungan laboratorium atau jaringan produksi Anda.
 
-## Persyaratan Sistem
-- 🛜 Router MikroTik
-- 💻 Server/VPS
-- 🐍 Python version 3.xx
+### 📋 Prasyarat Sistem (Prerequisites)
+Sebelum melakukan pemasangan, pastikan infrastruktur Anda memenuhi kriteria berikut:</br>
+- **Perangkat Tepi:** Routerboard MikroTik (Teruji pada `RB941-2nD-TC`, `RB750r2`, dan `RB951G-2HnD` dengan RouterOS v6.x maupun v7.x).</br>
+- **Server Pengendali:** Server fisik, Virtual Machine, atau Raspberry Pi yang menjalankan **Debian 12 / Ubuntu Server 22.04 LTS**.</br>
+- **Python Runtime:** Python 3.8 atau versi yang lebih tinggi (`Python >= 3.8`).</br>
+- **Konektivitas:** Pastikan server Debian dan Router MikroTik dapat saling melakukan ping (*IP reachability*) dan service API aktif pada router:
+```conf
+# Di terminal MikroTik Anda, aktifkan service API
+/ip service enable api
+```
 
-## Installasi
-<a href="./docs/install.md">
-  <img src="https://img.shields.io/badge/📥-Install-green?style=for-the-badge" />
-</a>
-
-## Panduan Cepat
-**TME-CORE** dapat diinstal di Linux Debian/Ubuntu (Server Lokal maupun Cloud VPS).</br>
-
-**Langkah Instalasi Otomatis:**</br>
-
-1. **Clone repositori ini**:</br>
+### 🛠️ Pemasangan (Installation)
+Gunakan skrip otomatisasi instalasi (*Auto-Installer*) yang disediakan untuk mempermudah proses inisiasi lingkungan Python:
+1. **Unduh (Clone) Repositori:**</br>
 **Menggunakan `SSH`**:
 ```bash
 git clone git@github.com:TEUNGKU-ZULKIFLI/TME-CORE.git
 ```
+
 **Atau dengan menggunakan `HTTP`**:
 ```bash
 git clone https://github.com/TEUNGKU-ZULKIFLI/TME-CORE.git
 ```
-**Kemudian masuk ke`Repo` tersebut dengan**:
-```bash
-cd TME-CORE
-```
 
-2. **Jalankan Script Installer**:
+2. **Jalankan Auto-Installer:**
 ```bash
 chmod +x install.sh
 ```
+
+Berikan izin eksekusi pada skrip, lalu jalankan:
 ```bash
 source install.sh
 ```
 
-> [!IMPORTANT]
-> *Script ini akan otomatis membuatkan Virtual Environment (**`venv`**) dan menginstal pustaka yang dibutuhkan*.
+*Skrip ini akan otomatis membuat virtual environment (`venv`), memperbarui `pip`, menginstal seluruh pustaka dependensi (`requirements.txt`), serta membuat berkas konfigurasi `.env` dari templat.*
 
-<a href="./docs/getting_started.md">
-  <img src="https://img.shields.io/badge/🚀-Getting%20Started-blue?style=for-the-badge" />
-</a>
+### ⚙️ Konfigurasi (Configuration)
+Konfigurasikan variabel rahasia dan parameter mitigasi sistem melalui berkas `.env` yang berada di direktori *root* proyek:
+```
+nano .env
+```
 
-## Uninstallasi
-<a href="./docs/uninstall.md">
-  <img src="https://img.shields.io/badge/🗑️-Uninstall-red?style=for-the-badge" />
-</a>
+Sesuaikan parameter di dalamnya dengan topologi pengujian Anda:
+```
+# IP Address dan Port API MikroTik
+MIKROTIK_IP=192.168.10.1
+MIKROTIK_PORT=8728
+MIKROTIK_USER=admin
+MIKROTIK_PASS=admin
 
-## Troubleshooting
-<a href="./docs/troubleshooting.md">
-  <img src="https://img.shields.io/badge/🔧-Troubleshooting-orange?style=for-the-badge" />
-</a>
+# Whitelist IP Administrator (Kebal dari pemblokiran otomatis)
+WHITELIST_IPS=127.0.0.1,192.168.10.2
 
-## Tujuan
-Memberikan perlindungan ekstra pada Router MikroTik dengan cara yang **ringan, cepat, dan menyenangkan** untuk sysadmin yang ingin tidur lebih nyenyak 😴.
+# Kredensial Notifikasi Telegram Bot API
+TELEGRAM_TOKEN=1234567890:Auah_ybFTHbGj
+TELEGRAM_CHAT_ID=987654321
+```
 
-## Kontribusi
+## ⚙️ Menjalankan Sistem (Deployment)
+1. **Pengujian Manual (Fase Debugging)**</br>
+Aktifkan lingkungan virtual Python dan jalankan program utama menggunakan modul Python:
+```
+source venv/bin/activate
+python3 -m src.main_engine
+```
 
-## Lisensi
+Sistem akan memunculkan menu `TME-CORE Doctor` untuk memverifikasi kesehatan lingkungan kerja Anda sebelum sesi pemantauan dimulai secara real-time.
 
-## Kontak Support
+2. **Pemasangan Sebagai Layanan Latar Belakang (Systemd Daemon)**</br>
+Untuk menjamin kesinambungan operasional 24 jam tanpa harus membiarkan sesi terminal terminal tetap terbuka, pasang TME-CORE sebagai layanan sistem operasi (*system service*):</br>
+1. Salin berkas unit layanan (sesuaikan path di dalam `tmecore.service` jika username Debian Anda bukan `/home/teungku`):
+```
+sudo cp assets/tmecore.service /etc/systemd/system/
+```
+
+2. Muat ulang daemon, aktifkan layanan, dan jalankan:
+```
+sudo systemctl daemon-reload
+sudo systemctl enable tmecore.service
+sudo systemctl start tmecore.service
+```
+
+3. Pantau log operasional secara *real-time* menggunakan jurnal Linux:
+```
+sudo journalctl -u tmecore.service -f
+```
+
+## 📈 Struktur Data Evaluasi
+Seluruh hasil pemantauan dan barang bukti eksperimen disimpan secara terpisah di dalam folder `/data` guna menunjang pengolahan statistik skripsi Anda:</br>
+- `/data/db/tme_state.json`: Menyimpan ingatan jangka panjang status kegagalan login dan IP terblokir (*State Persistence*).</br>
+- `/data/metrics/evaluasi_kinerja.csv`: File relasional berisi metrik Beban CPU, Memori RAM Bebas, Latensi, dan Packet Loss saat mitigasi terjadi. Sangat penting untuk diolah menjadi grafik garis di Bab IV.</br>
+- `/data/logs/tmecore_system.log`: Log internal kesehatan mesin mitigasi TME-CORE.
+
+## 🤝 Berkontribusi (Contributing)
+Kami sangat menyambut baik kontribusi untuk pengembangan sistem ke depan! Silakan baca CONTRIBUTING.md untuk detail panduan, penulisan kode (*SOP*), dan proses penyerahan *Pull Request*.
+
+## 🏷️ Versi Rilis (Versioning)
+Sistem ini dikelola menggunakan skema penomoran versi SemVer. Untuk melihat histori versi, perubahan fitur, dan rilis versi stabil, silakan kunjungi halaman Releases.
+
+## 👨‍💻 Penulis (Authors)
+**Teungku Zulkifli** - *Pemilik Proyek & Penulis Utama* - TEUNGKU-ZULKIFLI
+
+## 📄 Lisensi (License)
+Proyek ini dilisensikan di bawah Lisensi MIT - Lihat berkas LICENSE untuk informasi lebih detail.
+
+## 🎓 Penghargaan (Acknowledgments)
+- Terima kasih yang sebesar-besarnya kepada **Dosen Pembimbing Utama (DPU)** & **Dosen Pembimbing Pendamping (DPP)** Jurusan Teknologi Informasi dan Komputer, Politeknik Negeri Lhokseumawe atas bimbingan akademisnya.</br>
+- Rekan-rekan mahasiswa angkatan Teknologi Rekayasa Komputer Jaringan (TRKJ).
