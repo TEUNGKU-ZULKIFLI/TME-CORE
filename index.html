@@ -5,13 +5,13 @@
   <title>TME-CORE Docs</title>
   <link rel="stylesheet" href="assets/css/index.css">
   <link rel="stylesheet" href="assets/css/asciinema-player.css">
+  <?xml-stylesheet href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.2.0/css/all.min.css" type="text/css">
   <script src="assets/js/marked.min.js"></script>
 </head>
 <body>
   <header>
     <nav>
       <a href="#readme">README</a>
-      <a href="#getting_started">Getting Started</a>
       <a href="#casts">Casts</a>
     </nav>
   </header>
@@ -21,29 +21,14 @@
       <h2>README</h2>
       <div id="readme-content"></div>
     </section>
-
-    <section id="getting_started">
-      <h2>Getting Started</h2>
-      <div id="getting-started-content"></div>
-    </section>
-
     <section id="casts">
       <h2>Terminal Casts</h2>
-
-      <h3>Installasi</h3>
-      <div id="installasi" class="cast-player"></div>
 
       <h3>Connection</h3>
       <div id="connection" class="cast-player"></div>
 
-      <h3>Config</h3>
-      <div id="config" class="cast-player"></div>
-
       <h3>Log Parser</h3>
       <div id="log_parser" class="cast-player"></div>
-
-      <h3>Main Engine</h3>
-      <div id="main_engine" class="cast-player"></div>
 
       <h3>Realtime CPU & RAM</h3>
       <div id="realtime_cpu_ram" class="cast-player"></div>
@@ -58,14 +43,9 @@
   <script>
     // Render README.md
     fetch('README.md')
-      .then(r => r.text())
-      .then(t => { document.getElementById('readme-content').innerHTML = marked.parse(t); });
-
-    // Render docs/getting_started.md
-    fetch('docs/getting_started.md')
-      .then(r => r.text())
-      .then(t => { document.getElementById('getting-started-content').innerHTML = marked.parse(t); });
-
+        .then(r => r.text())
+        .then(t => {
+          document.getElementById('readme-content').innerHTML = marked.parse(t);
     // Asciinema players
     AsciinemaPlayer.create('assets/casts/installasi.cast', document.getElementById('installasi'));
     AsciinemaPlayer.create('assets/casts/connection.cast', document.getElementById('connection'));
@@ -73,6 +53,7 @@
     AsciinemaPlayer.create('assets/casts/log_parser.cast', document.getElementById('log_parser'));
     AsciinemaPlayer.create('assets/casts/main_engine.cast', document.getElementById('main_engine'));
     AsciinemaPlayer.create('assets/casts/realtime_cpu_ram.cast', document.getElementById('realtime_cpu_ram'));
+    });
   </script>
 </body>
 </html>

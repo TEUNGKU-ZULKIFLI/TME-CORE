@@ -24,7 +24,7 @@
 Proyek ini dibangun sebagai bagian dari penelitian tugas akhir/skripsi pada program studi **Teknologi Rekayasa Komputer Jaringan, Politeknik Negeri Lhokseumawe**.
 
 ## 💡 Kenapa Proyek Ini Penting & Berguna?
-Pada perangkat jaringan tingkat tepi (*edge router*) dengan sumber daya terbatas (seperti MikroTik hAP lite / `RB941-2nD-TC`), memproses serangan *brute force* masif yang bertubi-tubi akan menyiksa CPU hingga mencapai **utilitas puncak 100%**. Skenario tanpa mitigasi ini berakibat fatal:</br>
+Pada perangkat jaringan tingkat tepi (*edge router*) dengan sumber daya terbatas (seperti MikroTik hAP lite / [<kbd>`RB941-2nD-TC`](https://mikrotik.com/product/RB941-2nD-TC), memproses serangan *brute force* masif yang bertubi-tubi akan menyiksa CPU hingga mencapai **utilitas puncak 100%**. Skenario tanpa mitigasi ini berakibat fatal:</br>
 1. Router menjadi **sangat lambat** (*severe lag*), tidak responsif, dan paket-paket data penting mengalami gangguan.</br>
 2. Memaksa prosesor bekerja keras dalam jangka panjang memicu *hardware stress* dan **system crash** (kelumpuhan total).</br>
 3. Melakukan analisis log di dalam router menggunakan *internal scripting* bawaan RouterOS justru memperburuk utilisasi CPU router itu sendiri.
@@ -35,28 +35,14 @@ TME-CORE memecahkan masalah ini dengan memindahkan beban kerja komputasi analiti
 - **Jalur B (Active Session Guard):** Mengawasi celah bypass otentikasi. Jika penyerang berhasil masuk (*login success*) pasca rentetan kegagalan, sistem memutus paksa sesi aktif (*session kick*) via *script injection* v6.x / API v7.x dan mengisolasi IP-nya seketika.
 
 ## 🗺️ Arsitektur Aliran Data
-```mermaid
-flowchart TD
-    Attacker["KALI LINUX (Attacker)"]
-    MikroTik["MIKROTIK ROUTEROS"]
-    Debian["DEBIAN SERVER (Host)\n*TME-CORE ENGINE*"]
-    StateDB["tme_state.json"]
-    Telegram["TELEGRAM API BOT"]
-    Admin["HP ADMIN (Smartphone)"]
-
-    Attacker -->|"Injeksi Brute Force"| MikroTik
-    MikroTik -->|"API Session TCP 8728"| Debian
-    Debian <--> StateDB
-    Debian -->|"API HTTPS Notifikasi"| Telegram
-    Telegram -->|"Push Notification"| Admin
-```
+<img src="assets/images/arsitekturalirandata.png" />
 
 ## 🚀 Bagaimana Saya Memulainya?
 Ikuti panduan langkah demi langkah di bawah ini untuk memasang dan menjalankan TME-CORE di lingkungan laboratorium atau jaringan produksi Anda.
 
 ### 📋 Prasyarat Sistem (Prerequisites)
 Sebelum melakukan pemasangan, pastikan infrastruktur Anda memenuhi kriteria berikut:</br>
-- **Perangkat Tepi:** Routerboard MikroTik (Teruji pada `RB941-2nD-TC`, `RB750r2`, dan `RB951G-2HnD` dengan RouterOS v6.x maupun v7.x).</br>
+- **Perangkat Tepi:** Routerboard MikroTik (Teruji pada [<kbd>`RB941-2nD-TC`](https://mikrotik.com/product/RB941-2nD-TC), [<kbd>`RB750r2`](https://mikrotik.com/product/RB750r2), dan [<kbd>`RB951G-2HnD`](https://mikrotik.com/product/RB951G-2HnD) dengan RouterOS v6.x maupun v7.x).</br>
 - **Server Pengendali:** Server fisik, Virtual Machine, atau Raspberry Pi yang menjalankan **Debian 12 / Ubuntu Server 22.04 LTS**.</br>
 - **Python Runtime:** Python 3.8 atau versi yang lebih tinggi (`Python >= 3.8`).</br>
 - **Konektivitas:** Pastikan server Debian dan Router MikroTik dapat saling melakukan ping (*IP reachability*) dan service API aktif pada router:
@@ -89,6 +75,8 @@ source install.sh
 ```
 
 *Skrip ini akan otomatis membuat virtual environment (`venv`), memperbarui `pip`, menginstal seluruh pustaka dependensi (`requirements.txt`), serta membuat berkas konfigurasi `.env` dari templat.*
+<h3>Installasi Cast</h3>
+<div id="installasi" class="cast-player"></div>
 
 ### ⚙️ Konfigurasi (Configuration)
 Konfigurasikan variabel rahasia dan parameter mitigasi sistem melalui berkas `.env` yang berada di direktori *root* proyek:
@@ -111,6 +99,8 @@ WHITELIST_IPS=127.0.0.1,192.168.10.2
 TELEGRAM_TOKEN=1234567890:Auah_ybFTHbGj
 TELEGRAM_CHAT_ID=987654321
 ```
+<h3>Config Cast</h3>
+<div id="config" class="cast-player"></div>
 
 ## ⚙️ Menjalankan Sistem (Deployment)
 1. **Pengujian Manual (Fase Debugging)**</br>
@@ -121,25 +111,28 @@ python3 -m src.main_engine
 ```
 
 Sistem akan memunculkan menu `TME-CORE Doctor` untuk memverifikasi kesehatan lingkungan kerja Anda sebelum sesi pemantauan dimulai secara real-time.
+<h3>Main Engine Cast</h3>
+<div id="main_engine" class="cast-player"></div>
 
 2. **Pemasangan Sebagai Layanan Latar Belakang (Systemd Daemon)**</br>
 Untuk menjamin kesinambungan operasional 24 jam tanpa harus membiarkan sesi terminal terminal tetap terbuka, pasang TME-CORE sebagai layanan sistem operasi (*system service*):</br>
-1. Salin berkas unit layanan (sesuaikan path di dalam `tmecore.service` jika username Debian Anda bukan `/home/teungku`):
-```
-sudo cp assets/tmecore.service /etc/systemd/system/
-```
 
-2. Muat ulang daemon, aktifkan layanan, dan jalankan:
-```
-sudo systemctl daemon-reload
-sudo systemctl enable tmecore.service
-sudo systemctl start tmecore.service
-```
+	2.1. Salin berkas unit layanan (sesuaikan path di dalam `tmecore.service` jika username Debian Anda bukan `/home/teungku`):
+	```
+	sudo cp assets/tmecore.service /etc/systemd/system/
+	```
 
-3. Pantau log operasional secara *real-time* menggunakan jurnal Linux:
-```
-sudo journalctl -u tmecore.service -f
-```
+	2.2. Muat ulang daemon, aktifkan layanan, dan jalankan:
+	```
+	sudo systemctl daemon-reload
+	sudo systemctl enable tmecore.service
+	sudo systemctl start tmecore.service
+	```
+
+	2.3. Pantau log operasional secara *real-time* menggunakan jurnal Linux:
+	```
+	sudo journalctl -u tmecore.service -f
+	```
 
 ## 📈 Struktur Data Evaluasi
 Seluruh hasil pemantauan dan barang bukti eksperimen disimpan secara terpisah di dalam folder `/data` guna menunjang pengolahan statistik skripsi Anda:</br>
@@ -148,16 +141,16 @@ Seluruh hasil pemantauan dan barang bukti eksperimen disimpan secara terpisah di
 - `/data/logs/tmecore_system.log`: Log internal kesehatan mesin mitigasi TME-CORE.
 
 ## 🤝 Berkontribusi (Contributing)
-Kami sangat menyambut baik kontribusi untuk pengembangan sistem ke depan! Silakan baca CONTRIBUTING.md untuk detail panduan, penulisan kode (*SOP*), dan proses penyerahan *Pull Request*.
+Kami sangat menyambut baik kontribusi untuk pengembangan sistem ke depan! Silakan baca [CONTRIBUTING](CONTRIBUTING.md) untuk detail panduan, penulisan kode (*SOP*), dan proses penyerahan *Pull Request*.
 
 ## 🏷️ Versi Rilis (Versioning)
-Sistem ini dikelola menggunakan skema penomoran versi SemVer. Untuk melihat histori versi, perubahan fitur, dan rilis versi stabil, silakan kunjungi halaman Releases.
+Sistem ini dikelola menggunakan skema penomoran versi [SemVer](https://semver.org/). Untuk melihat histori versi, perubahan fitur, dan rilis versi stabil, silakan kunjungi halaman [Releases](https://github.com/TEUNGKU-ZULKIFLI/TME-CORE/releases).
 
 ## 👨‍💻 Penulis (Authors)
-**Teungku Zulkifli** - *Pemilik Proyek & Penulis Utama* - TEUNGKU-ZULKIFLI
+**Teungku Zulkifli** - *Pemilik Proyek & Penulis Utama* - [TEUNGKU-ZULKIFLI](https://teungku-zulkifli.github.io/)
 
 ## 📄 Lisensi (License)
-Proyek ini dilisensikan di bawah Lisensi MIT - Lihat berkas LICENSE untuk informasi lebih detail.
+Proyek ini dilisensikan di bawah Lisensi MIT - Lihat berkas [LICENSE](LICENSE.md) untuk informasi lebih detail.
 
 ## 🎓 Penghargaan (Acknowledgments)
 - Terima kasih yang sebesar-besarnya kepada **Dosen Pembimbing Utama (DPU)** & **Dosen Pembimbing Pendamping (DPP)** Jurusan Teknologi Informasi dan Komputer, Politeknik Negeri Lhokseumawe atas bimbingan akademisnya.</br>
