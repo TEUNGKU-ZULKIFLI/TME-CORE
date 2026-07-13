@@ -1,9 +1,3 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: night)" srcset="../assets/logos/TME-logo01.png" />
-    <img src="../assets/logos/TME-logo01.png" width="500" />
-  </picture>
-</p>
 <h1 align="center">
   <span><b>🚀 Getting Started with TME-CORE</b></span>
 </h1>
@@ -11,150 +5,104 @@
 <span align="center">Selamat datang di panduan penggunaan <b>Teungku Mitigation Engine - Core (TME-CORE)</b>. Panduan ini akan memandu Anda langkah demi langkah untuk menghubungkan sistem deteksi ini dengan Router MikroTik Anda.</span>
 </p>
 
-## 📋 1. Persiapan Router MikroTik (Pre-requisites)
+---
 
-Sebelum menjalankan TME-CORE, Anda wajib melakukan sedikit konfigurasi di Router MikroTik target:</br>
+# 🚀 Panduan Memulai (Getting Started Guide)
+Dokumen ini memandu Anda melakukan konfigurasi awal, memverifikasi kesehatan program menggunakan modul diagnosa internal, serta menjalankan TME-CORE sebagai layanan latar belakang secara terus-menerus.
 
-1. **Aktifkan Layanan API**:</br>
-Buka terminal MikroTik (New Terminal) atau SSH, lalu ketikkan:
-```bash
-/ip services enable api
+## ⚙️ Langkah 1: Konfigurasi Variabel Lingkungan (.env)
+TME-CORE memisahkan kredensial sensitif dari logika program utama. Buka dan edit berkas `.env` yang berada di direktori *root* proyek Anda:
 ```
-
-2. **Buat Rule Firewall Block**:</br>
-TME-CORE bertugas memasukkan IP penyerang ke dalam daftar hitam bernama `brute_force_block`. Anda harus membuat rule yang memblokir daftar tersebut:
-```bash
-/ip firewall filter add chain=input action=drop src-address-list=brute_force_block comment="Drop brute_force_block - TME-CORE"
-```
-> [!TIP]
-> (Pastikan rule ini berada di urutan teratas/atas rule accept lainnya pada menu IP > Firewall > Filter Rules).
-
-3. **(Opsional) Sinkronisasi Waktu**:</br>
-Sangat disarankan mengaktifkan NTP Client di MikroTik agar log waktu akurat:
-```bash
-/system ntp client set enabled=yes primary-ntp=162.159.200.1
-```
-
-## 🛠️ 2. Konfigurasi Lingkungan (TME-CORE Server)
-
-TME-CORE dapat diinstal di Linux Debian/Ubuntu (Server Lokal maupun Cloud VPS).</br>
-
-**Langkah Instalasi Otomatis:**</br>
-
-1. **Clone repositori ini**:</br>
-**Menggunakan `SSH`**:
-```bash
-git clone git@github.com:TEUNGKU-ZULKIFLI/TME-CORE.git
-```
-**Atau dengan menggunakan `HTTP`**:
-```bash
-git clone https://github.com/TEUNGKU-ZULKIFLI/TME-CORE.git
-```
-**Kemudian masuk ke`Repo` tersebut dengan**:
-```bash
-cd TME-CORE
-```
-
-2. **Jalankan Script Installer**:
-```bash
-chmod +x install.sh
-```
-```bash
-source install.sh
-```
-
-> [!IMPORTANT]
-> *Script ini akan otomatis membuatkan Virtual Environment (**`venv`**) dan menginstal pustaka yang dibutuhkan*.
-
-## 🔐 3. Mengisi Kredensial Rahasia (.env)
-
-Keamanan adalah prioritas. TME-CORE menggunakan file `.env` untuk menyimpan kata sandi Anda.</br>
-
-1. **Buka file `.env` menggunakan text editor (contoh: nano)**:
-```bash
 nano .env
 ```
 
-2. **Sesuaikan isinya dengan topologi Anda**:
-```config
-# Ganti dengan IP dan Password MikroTik Anda
+Sesuaikan nilai variabel di dalamnya dengan topology laboratorium Anda:
+```
+# Alamat IP dan Port API Router MikroTik Anda
 MIKROTIK_IP=192.168.10.1
-MIKROTIK_USER=admin
-MIKROTIK_PASS=password_rahasia
 MIKROTIK_PORT=8728
+MIKROTIK_USER=admin
+MIKROTIK_PASS=admin
 
-# Masukkan IP Anda sendiri agar tidak keblokir saat salah password
-WHITELIST_IPS=192.168.10.2,127.0.0.1
+# Whitelist IP Administrator (IP ini kebal dari pemblokiran otomatis)
+WHITELIST_IPS=127.0.0.1,192.168.10.2
 
-# Isi jika ingin menggunakan notifikasi Telegram
-TELEGRAM_TOKEN=123456789:ABCDEF...
+# Kredensial Notifikasi Telegram Bot API
+TELEGRAM_TOKEN=1234567890:AAH_qWkLx2E8v9Yp...
 TELEGRAM_CHAT_ID=987654321
 ```
-> [!WARNING]
-> *(Tekan **Ctrl+X**, lalu **Y**, dan **Enter** untuk menyimpan).*
 
-## 🏃 4. Uji Coba (Pre-Flight Check)
+> Cara Mendapatkan **`TOKEN`** dan **`ID`** Bot Telegram
+>  - **Pertama**:</br>
+      - Pastikan sudah punya **`Account Telegram`** dong!</br>
+      - Langsung ke `pencarian` dan ketik `@BotFather` dan pilih yang sesuai dengan yang tertera.</br>
+      - Gas **`START`**
+>  - **Kedua**:</br>
+      - Ketikkan pada kolom Pesan dengan `/newbot`</br>
+      - Berikan nama untuk bot contoh: `example`</br>
+      - Selanjutnya username bot contoh: `example_bot`</br>
+      - Jika berhasil nanti akan ditampilkan `Done! Conratulations on your new bot.`</br>
+      - Kemudian mencari kalimat `Use this token to access the HTTP API:` dan mencatat HTTP API nya. </br>
+      - 🎉 Selamat kita sudah mendapatkan **`TOKEN`**
+>  - **Ketiga**:</br>
+      - Kembali ke `home` karena ada satu lagi yang kita perlukan!</br>
+      - Langsung ke `pencarian` dan ketik `@userinfobot` dan pilih yang sesuai dengan yang tertera.</br>
+      - Gas **`START`**</br>
+      - Setelah itu bot tersebut akan mengembalikan data-data seperti `@username_account` dan info lainnya.</br>
+      - Temukan `Id:xxxx` dan catat ke memo.</br>
+      - 🎉 Selamat kita sudah mendapatkan **`ID`**</br>
 
-Sebelum menjalankan sebagai layanan *background*, mari kita uji apakah konfigurasi Anda sudah benar.</br>
-
-1. **Aktifkan *Virtual Environment***:
-```bash
-source venv/bin/activate
+## 🔍 Langkah 2: Verifikasi Menggunakan TME-CORE Doctor
+Sebelum menjalankan mesin pemantauan utama, jalankan modul diagnosa internal (*Pre-flight Doctor Check*) untuk memastikan server Debian dan router MikroTik siap berkolaborasi tanpa masalah:
+  - Aktifkan virtual environment jika belum aktif
+  ```
+  source venv/bin/activate
+  ```
+  
+  - Jalankan modul utama
+  ```
+  python3 -m src.main_engine
+  ```
+Sistem akan memunculkan verifikasi visual kesehatan lingkungan kerja seperti di bawah ini:
+```
+🔍 Menjalankan TME-CORE Doctor...
+  [✓] Python Version : 3.11 (Terdukung)
+  [✓] Environment    : File .env ditemukan
+  [✓] Data Directory : Folder penyimpanan log siap
+  [✓] Notifikasi     : Bot Telegram Terkonfigurasi
+-----------------------------------------------------------------
+[✓] Doctor: Semua sistem dalam kondisi PRIMA!
 ```
 
-2. **Jalankan TME-CORE `Doctor` & `Engine`**:
-```bash
+## ⚙️ Langkah 3: Deployment (Menjalankan Sistem)
+### Skenario A: Menjalankan Secara Manual (Fase Debugging)
+Untuk memantau aktivitas logs dan deteksi serangan secara real-time langsung pada terminal Anda, jalankan program utama:
+```
 python3 -m src.main_engine
 ```
-> [!IMPORTANT]
-> Jika Anda melihat pesan **"[+] TME-CORE Engine siap menahan serangan!"**, berarti instalasi Anda sukses! Tekan **`Ctrl+C`** untuk mematikan.
 
-## ⚙️ 5. Menjalankan Sebagai Layanan 24/7 (Systemd)
+Biarkan terminal tetap terbuka untuk memantau bagaimana *engine* mengekstrak IP penyerang menggunakan Regex saat uji coba serangan brute force dilakukan.
 
-Agar TME-CORE tetap berjalan meskipun terminal ditutup, jadikan sebagai *Service*.</br>
-
-1. Buat file **`service`**:</br>
-```bash
-sudo nano /etc/systemd/system/tmecore.service
-```
-2. Isi dengan konfigurasi berikut (Sesuaikan **`/home/teungku/`** dengan *path user* Linux Anda):
-```config
-[Unit]
-Description=TME-CORE MikroTik Mitigation Engine
-After=network-online.target
-
-[Service]
-Type=simple
-User=teungku
-WorkingDirectory=/home/teungku/TME-CORE
-EnvironmentFile=/home/teungku/TME-CORE/.env
-Environment=PYTHONUNBUFFERED=1
-ExecStart=/home/teungku/TME-CORE/venv/bin/python -m src.main_engine
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-```
-
-3. Terapkan dan Nyalakan:
-```bash
-sudo systemctl daemon-reload
-```
-```bash
-sudo systemctl enable --now tmecore.service
-```
-
-4. **Cek Log Langsung**: 
-```bash
-sudo journalctl -u tmecore.service -f
-```
-## 📂 6. Manajemen Data & Log
-
-TME-CORE secara otomatis menyusun data operasi Anda di dalam folder **`data/`**:
-
-- **`data/logs/tmecore_system.log`** : Mencatat riwayat operasional engine (kapan `nyala/mati/error`).</br>
-
-- **`data/metrics/evaluasi_kinerja.csv`** : Metrik evaluasi `CPU` dan `RAM` untuk keperluan analisis.</br>
-
-- **`data/db/tme_state.json`** : Ingatan jangka panjang (IP yang sedang diblokir).</br>
+### Skenario B: Menjalankan Sebagai Layanan Latar Belakang (Systemd)
+Untuk menjamin TME-CORE tetap mengamankan jaringan Anda selama 24 jam tanpa harus membiarkan terminal SSH Debian terbuka, pasang program sebagai *System Service*:
+  1. Salin berkas unit layanan ke direktori systemd Linux:
+  ```
+  sudo cp assets/tmecore.service /etc/systemd/system/
+  ```
+  
+  2. *Reload* daemon Linux, aktifkan fitur *auto-start* saat boot, dan jalankan layanan:
+  ```
+  sudo systemctl daemon-reload
+  sudo systemctl enable tmecore.service
+  sudo systemctl start tmecore.service
+  ```
+   
+  3. Pantau status keaktifan layanan secara real-time:
+  ```
+  sudo systemctl status tmecore.service
+  ```
+  
+  4. Lakukan live tracking log operasional melalui jurnal Linux:
+  ```
+  sudo journalctl -u tmecore.service -f
+  ```

@@ -1,66 +1,72 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: night)" srcset="../assets/logos/TME-logo01.png" />
-    <img src="../assets/logos/TME-logo01.png" width="500" />
-  </picture>
-</p>
 <h1 align="center">
   <span><b align="center">📥 INSTALLASI with TME-CORE</b></span>
 </h1>
 
-## Quick Guide
-Clone pake **`SSH`**
-```bash
-git clone git@github.com:TEUNGKU-ZULKIFLI/TME-CORE.git
+---
+
+# 📥 Panduan Pemasangan (Installation Guide)
+Panduan ini menjelaskan prosedur instalasi **TME-CORE** di server pengontrol eksternal berbasis Linux Debian/Ubuntu secara rinci.
+
+## 📋 Prasyarat Sistem (Prerequisites)
+Sebelum melanjutkan proses instalasi, pastikan infrastruktur laboratorium atau produksi Anda memenuhi kriteria berikut:
+
+1. **Sisi Server Pengendali (Debian/Ubuntu Server)**
+    - **Sistem Operasi**: Debian 11/12 (Direkomendasikan) atau Ubuntu Server 20.04/22.04 LTS.
+    - **Python Runtime**: Python versi $3.8$ atau yang lebih baru (`Python >= 3.8`).
+    - **Soket Jaringan**: Port biner API MikroTik (Port default `8728`) harus dapat dijangkau dari server ini.
+
+2. **Sisi Perangkat Target (MikroTik RouterOS)**
+    - **Perangkat Keras**: Semua varian RouterBoard (teruji pada `RB941-2nD-TC`, `RB750r2`, dan `RB951G-2HnD`).
+    - **Versi Sistem Operasi**: RouterOS v6.x (Long-term/Stable) atau RouterOS v7.x.
+    - **Aktivasi Layanan**: API Service harus diaktifkan.
+
+## 🛠️ Langkah-Langkah Instalasi
+1. **Persiapan Konektivitas MikroTik**
+Pastikan Anda telah mengaktifkan layanan API di router MikroTik target. Masuk ke terminal MikroTik Anda (via Winbox atau SSH) dan jalankan perintah berikut:
+    - Mengaktifkan layanan API port biner default 8728
+    ```
+    /ip service enable api
+    ```
+    
+    - (Opsional) Membatasi akses API hanya dari alamat IP server Debian untuk keamanan tambahan
+    ```
+    /ip service set api address=192.168.10.2/32
+    ```
+
+3. **Kloning Repositori TME-CORE**
+    - **Menggunakan `SSH`**:
+    ```bash
+    git clone git@github.com:TEUNGKU-ZULKIFLI/TME-CORE.git
+    ```
+    
+    - **Atau dengan menggunakan `HTTP`**:
+    ```bash
+    git clone https://github.com/TEUNGKU-ZULKIFLI/TME-CORE.git
+    ```
+
+3. **Eksekusi Skrip Instalasi Otomatis (Auto-Installer)**
+TME-CORE telah dilengkapi dengan skrip otomatisasi `install.sh` untuk menyiapkan seluruh kebutuhan lingkungan Python:
+    - Memberikan izin eksekusi pada skrip
+    ```
+    chmod +x install.sh
+    ```
+    - Menjalankan instalasi menggunakan perintah source
+    ```
+    source install.sh
+    ```
+   💡 Apa yang Dilakukan oleh Skrip `install.sh`?
+    1. Membuat lingkungan Python terisolasi (*Virtual Environment*) di direktori `venv/`.
+    2. Memperbarui manajer pustaka `pip` ke versi terbaru.
+    3. Memasang pustaka luar yang terdaftar pada `requirements.txt` (`routeros_api`, `requests`, `python-dotenv`).
+    4. Menyalin berkas template `.env.example` menjadi berkas konfigurasi aktif `.env`.
+
+## 🔍 Verifikasi Struktur Direktori Data
+Setelah instalasi selesai, pastikan struktur penyimpanan data lokal untuk mendukung operasional dan ekspor metrik skripsi Anda telah terbentuk dengan benar pada direktori `TME-CORE/data/`:
 ```
-Atau memakai **`HTTPS`**
-```bash
-git clone https://github.com/TEUNGKU-ZULKIFLI/TME-CORE.git
-```
-Kemudian masuk kedirectory tersebut
-```bash
-cd TME-CORE
-```
-Running `install.sh` dengan `source`
-```bash
-chmod +x install.sh
-```
-```bash
-source install.sh
-```
-Membuka dan Konfigurasi file **`.env`**
-```bash
-nano .env
+TME-CORE/data/
+├── db/          # Menyimpan database persistensi tme_state.json
+├── logs/        # Menyimpan berkas log sistem tmecore_system.log
+└── metrics/     # Menyimpan dataset evaluasi_kinerja.csv (Sangat penting untuk Bab IV)
 ```
 
-> [!NOTE]
-> Cara Mendapatkan **`TOKEN`** dan **`ID`** Bot Telegram
-- **Pertama**:</br>
-    - Pastikan sudah punya **`Account Telegram`** dong!</br>
-    - Langsung ke `pencarian` dan ketik `@BotFather` dan pilih yang sesuai dengan yang tertera.
-    - Gas **`START`**
-- **Kedua**:</br>
-    - Ketikkan pada kolom Pesan dengan `/newbot`
-    - Berikan nama untuk bot contoh: `example`
-    - Selanjutnya username bot contoh: `example_bot`
-    - Jika berhasil nanti akan ditampilkan `Done! Conratulations on your new bot.`
-    - Kemudian mencari kalimat `Use this token to access the HTTP API:` dan mencatat HTTP API nya. 
-    - 🎉 Selamat kita sudah mendapatkan **`TOKEN`**
-- **Ketiga**:</br>
-    - Kembali ke `home` karena ada satu lagi yang kita perlukan!
-    - Langsung ke `pencarian` dan ketik `@userinfobot` dan pilih yang sesuai dengan yang tertera.
-    - Gas **`START`**
-    - Setelah itu bot tersebut akan mengembalikan data-data seperti `@username_account` dan info lainnya.
-    - Temukan `Id:xxxx` dan catat ke memo.
-    - 🎉 Selamat kita sudah mendapatkan **`ID`**</br>
-
-Setelah selesai menyesuaikan file Konfigurasi jalankan test koneksi
-```bash
-source venv/bin/activate && python3 -m src.api.connection
-```
-
-> [!IMPORTANT]
-> Jika sudah berhasil terhubung maka bisa melanjutkan kedalam membuat service yang berjalan **`24 jam`**</br>
-<a href="./getting_started.md#%EF%B8%8F-5-menjalankan-sebagai-layanan-247-systemd">
-  <img src="https://img.shields.io/badge/⚙️-ENGINE-orange?style=for-the-badge" />
-</a></br>
+Jika struktur di atas telah terbentuk dengan lengkap, Anda siap melangkah ke tahap konfigurasi dan pengujian pertama di berkas [Getting Started](getting_started.md).
