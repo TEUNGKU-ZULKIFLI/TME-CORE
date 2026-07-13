@@ -1,13 +1,7 @@
 <h1 align="center">
-  <span><b>🚀 Getting Started with TME-CORE</b></span>
+  <img src="https://img.shields.io/badge/🚀_Getting_Started_with-TME--CORE-blue?style=for-the-bad" />
 </h1>
-<p align="center">
-<span align="center">Selamat datang di panduan penggunaan <b>Teungku Mitigation Engine - Core (TME-CORE)</b>. Panduan ini akan memandu Anda langkah demi langkah untuk menghubungkan sistem deteksi ini dengan Router MikroTik Anda.</span>
-</p>
 
----
-
-# 🚀 Panduan Memulai (Getting Started Guide)
 Dokumen ini memandu Anda melakukan konfigurasi awal, memverifikasi kesehatan program menggunakan modul diagnosa internal, serta menjalankan TME-CORE sebagai layanan latar belakang secara terus-menerus.
 
 ## ⚙️ Langkah 1: Konfigurasi Variabel Lingkungan (.env)
@@ -33,24 +27,27 @@ TELEGRAM_CHAT_ID=987654321
 ```
 
 > Cara Mendapatkan **`TOKEN`** dan **`ID`** Bot Telegram
->  - **Pertama**:</br>
+  - **Pertama**:</br>
       - Pastikan sudah punya **`Account Telegram`** dong!</br>
       - Langsung ke `pencarian` dan ketik `@BotFather` dan pilih yang sesuai dengan yang tertera.</br>
       - Gas **`START`**
->  - **Kedua**:</br>
+  - **Kedua**:</br>
       - Ketikkan pada kolom Pesan dengan `/newbot`</br>
       - Berikan nama untuk bot contoh: `example`</br>
       - Selanjutnya username bot contoh: `example_bot`</br>
       - Jika berhasil nanti akan ditampilkan `Done! Conratulations on your new bot.`</br>
       - Kemudian mencari kalimat `Use this token to access the HTTP API:` dan mencatat HTTP API nya. </br>
       - 🎉 Selamat kita sudah mendapatkan **`TOKEN`**
->  - **Ketiga**:</br>
+  - **Ketiga**:</br>
       - Kembali ke `home` karena ada satu lagi yang kita perlukan!</br>
       - Langsung ke `pencarian` dan ketik `@userinfobot` dan pilih yang sesuai dengan yang tertera.</br>
       - Gas **`START`**</br>
       - Setelah itu bot tersebut akan mengembalikan data-data seperti `@username_account` dan info lainnya.</br>
       - Temukan `Id:xxxx` dan catat ke memo.</br>
       - 🎉 Selamat kita sudah mendapatkan **`ID`**</br>
+
+<h3>Config Cast</h3>
+<div id="config" class="cast-player"></div>
 
 ## 🔍 Langkah 2: Verifikasi Menggunakan TME-CORE Doctor
 Sebelum menjalankan mesin pemantauan utama, jalankan modul diagnosa internal (*Pre-flight Doctor Check*) untuk memastikan server Debian dan router MikroTik siap berkolaborasi tanpa masalah:
@@ -73,6 +70,9 @@ Sistem akan memunculkan verifikasi visual kesehatan lingkungan kerja seperti di 
 -----------------------------------------------------------------
 [✓] Doctor: Semua sistem dalam kondisi PRIMA!
 ```
+
+<h3>Main Engine Cast</h3>
+<div id="main_engine" class="cast-player"></div>
 
 ## ⚙️ Langkah 3: Deployment (Menjalankan Sistem)
 ### Skenario A: Menjalankan Secara Manual (Fase Debugging)

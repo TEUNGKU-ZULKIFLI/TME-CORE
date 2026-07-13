@@ -5,22 +5,54 @@
   <title>TME-CORE Docs</title>
   <link rel="stylesheet" href="assets/css/index.css">
   <link rel="stylesheet" href="assets/css/asciinema-player.css">
-  <?xml-stylesheet href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.2.0/css/all.min.css" type="text/css">
   <script src="assets/js/marked.min.js"></script>
 </head>
 <body>
   <header>
     <nav>
-      <a href="#readme">README</a>
-      <a href="#casts">Casts</a>
+	<a href="#install">
+	  <img src="https://img.shields.io/badge/📥-Install-green?style=for-the-badge" />
+	</a>
+	<a href="#getting_started">
+	  <img src="https://img.shields.io/badge/🚀-Getting%20Started-blue?style=for-the-badge" />
+	</a>
+	<a href="#troubleshooting">
+	  <img src="https://img.shields.io/badge/🔧-Troubleshooting-orange?style=for-the-badge" />
+	</a>
+	<a href="#uninstall">
+	  <img src="https://img.shields.io/badge/🗑️-Uninstall-red?style=for-the-badge" />
+	</a>
+        <a href="#casts">
+          <img src="https://img.shields.io/badge/📺-Casts-8A2BE2?style=for-the-badge" />
+        </a>
     </nav>
   </header>
 
   <main>
     <section id="readme">
-      <h2>README</h2>
       <div id="readme-content"></div>
     </section>
+
+    <section id="install">
+      <img src="https://img.shields.io/badge/📥-Install-green?style=for-the-badge" />
+      <div id="install-content"></div>
+    </section>
+
+    <section id="getting_started">
+      <img src="https://img.shields.io/badge/🚀-Getting%20Started-blue?style=for-the-badge" />
+      <div id="getting-started-content"></div>
+    </section>
+
+    <section id="troubleshooting">
+      <img src="https://img.shields.io/badge/🔧-Troubleshooting-orange?style=for-the-badge" />
+      <div id="troubleshooting-content"></div>
+    </section>
+
+    <section id="uninstall">
+      <img src="https://img.shields.io/badge/🗑️-Uninstall-red?style=for-the-badge" />
+      <div id="uninstall-content"></div>
+    </section>
+
     <section id="casts">
       <h2>Terminal Casts</h2>
 
@@ -33,27 +65,78 @@
       <h3>Realtime CPU & RAM</h3>
       <div id="realtime_cpu_ram" class="cast-player"></div>
     </section>
+
   </main>
 
   <footer>
     © 2026 TME-CORE Documentation
   </footer>
 
-  <script src="assets/js/asciinema-player.min.js"></script>
-  <script>
-    // Render README.md
-    fetch('README.md')
-        .then(r => r.text())
-        .then(t => {
-          document.getElementById('readme-content').innerHTML = marked.parse(t);
-    // Asciinema players
-    AsciinemaPlayer.create('assets/casts/installasi.cast', document.getElementById('installasi'));
-    AsciinemaPlayer.create('assets/casts/connection.cast', document.getElementById('connection'));
-    AsciinemaPlayer.create('assets/casts/config.cast', document.getElementById('config'));
-    AsciinemaPlayer.create('assets/casts/log_parser.cast', document.getElementById('log_parser'));
-    AsciinemaPlayer.create('assets/casts/main_engine.cast', document.getElementById('main_engine'));
-    AsciinemaPlayer.create('assets/casts/realtime_cpu_ram.cast', document.getElementById('realtime_cpu_ram'));
+<script src="assets/js/asciinema-player.min.js"></script>
+<script>
+  // Render README.md
+  fetch('README.md')
+    .then(r => r.text())
+    .then(t => {
+      document.getElementById('readme-content').innerHTML = marked.parse(t);
     });
-  </script>
+
+  // Render docs/install.md
+  fetch('docs/install.md')
+    .then(r => r.text())
+    .then(t => {
+      document.getElementById('install-content').innerHTML = marked.parse(t);
+
+      // attach player setelah konten md sudah masuk ke DOM
+      const installasi = document.getElementById('installasi');
+      if (installasi) {
+        AsciinemaPlayer.create('assets/casts/installasi.cast', installasi);
+      }
+    });
+
+  // Render docs/getting_started.md
+  fetch('docs/getting_started.md')
+    .then(r => r.text())
+    .then(t => {
+      document.getElementById('getting-started-content').innerHTML = marked.parse(t);
+
+      const config = document.getElementById('config');
+      if (config) {
+        AsciinemaPlayer.create('assets/casts/config.cast', config);
+      }
+      const main_engine = document.getElementById('main_engine');
+      if (main_engine) {
+        AsciinemaPlayer.create('assets/casts/main_engine.cast', main_engine);
+      }
+    });
+
+  // Render docs/troubleshooting.md
+  fetch('docs/troubleshooting.md')
+    .then(r => r.text())
+    .then(t => {
+      document.getElementById('troubleshooting-content').innerHTML = marked.parse(t);
+    });
+
+  // Render docs/uninstall.md
+  fetch('docs/uninstall.md')
+    .then(r => r.text())
+    .then(t => {
+      document.getElementById('uninstall-content').innerHTML = marked.parse(t);
+    });
+
+  // Player yang div‑nya memang ada di index.html
+  const connection = document.getElementById('connection');
+  if (connection) {
+    AsciinemaPlayer.create('assets/casts/connection.cast', connection);
+  }
+  const log_parser = document.getElementById('log_parser');
+  if (log_parser) {
+    AsciinemaPlayer.create('assets/casts/log_parser.cast', log_parser);
+  }
+  const realtime = document.getElementById('realtime_cpu_ram');
+  if (realtime) {
+    AsciinemaPlayer.create('assets/casts/realtime_cpu_ram.cast', realtime);
+  }
+</script>
 </body>
 </html>

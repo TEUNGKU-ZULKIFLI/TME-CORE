@@ -1,0 +1,15 @@
+[Unit]
+Description=TME-CORE MikroTik Mitigation Engine
+After=network.target
+
+[Service]
+# User yang menjalankan script
+User=<username>
+WorkingDirectory=/home/<username>/TME-CORE
+# Path ke Python di dalam Virtual Environment kamu
+ExecStart=/home/<username>/TME-CORE/venv/bin/python3 -m src.main_engine
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

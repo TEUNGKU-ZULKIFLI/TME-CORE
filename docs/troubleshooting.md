@@ -1,16 +1,7 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: night)" srcset="../assets/logos/TME-logo01.png" />
-    <img src="../assets/logos/TME-logo01.png" width="500" />
-  </picture>
-</p>
 <h1 align="center">
-  <span><b align="center">🔧 TROUBLESHOOTING with TME-CORE</b></span>
+  <img src="https://img.shields.io/badge/🔧_TROUBLESHOOTING_with-TME--CORE-orange?style=for-the-bad" />
 </h1>
 
----
-
-# 🔧 Panduan Troubleshooting
 Dokumen ini merangkum daftar masalah umum yang sering dihadapi oleh administrator jaringan saat mengintegrasikan TME-CORE dengan MikroTik beserta solusinya.
 
 ## 🚨 Masalah 1: Error Gagal Koneksi ke MikroTik API

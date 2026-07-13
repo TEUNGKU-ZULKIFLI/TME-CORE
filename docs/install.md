@@ -1,10 +1,7 @@
 <h1 align="center">
-  <span><b align="center">📥 INSTALLASI with TME-CORE</b></span>
+  <img src="https://img.shields.io/badge/📥_INSTALLASI_with-TME--CORE-green?style=for-the-bad" />
 </h1>
 
----
-
-# 📥 Panduan Pemasangan (Installation Guide)
 Panduan ini menjelaskan prosedur instalasi **TME-CORE** di server pengontrol eksternal berbasis Linux Debian/Ubuntu secara rinci.
 
 ## 📋 Prasyarat Sistem (Prerequisites)
@@ -16,7 +13,7 @@ Sebelum melanjutkan proses instalasi, pastikan infrastruktur laboratorium atau p
     - **Soket Jaringan**: Port biner API MikroTik (Port default `8728`) harus dapat dijangkau dari server ini.
 
 2. **Sisi Perangkat Target (MikroTik RouterOS)**
-    - **Perangkat Keras**: Semua varian RouterBoard (teruji pada `RB941-2nD-TC`, `RB750r2`, dan `RB951G-2HnD`).
+    - **Perangkat Keras**: Semua varian RouterBoard (Teruji pada [<kbd>`RB941-2nD-TC`](https://mikrotik.com/product/RB941-2nD-TC), [<kbd>`RB750r2`](https://mikrotik.com/product/RB750r2), dan [<kbd>`RB951G-2HnD`](https://mikrotik.com/product/RB951G-2HnD).
     - **Versi Sistem Operasi**: RouterOS v6.x (Long-term/Stable) atau RouterOS v7.x.
     - **Aktivasi Layanan**: API Service harus diaktifkan.
 
@@ -59,6 +56,9 @@ TME-CORE telah dilengkapi dengan skrip otomatisasi `install.sh` untuk menyiapkan
     2. Memperbarui manajer pustaka `pip` ke versi terbaru.
     3. Memasang pustaka luar yang terdaftar pada `requirements.txt` (`routeros_api`, `requests`, `python-dotenv`).
     4. Menyalin berkas template `.env.example` menjadi berkas konfigurasi aktif `.env`.
+
+<h3>Installasi Cast</h3>
+<div id="installasi" class="cast-player"></div>
 
 ## 🔍 Verifikasi Struktur Direktori Data
 Setelah instalasi selesai, pastikan struktur penyimpanan data lokal untuk mendukung operasional dan ekspor metrik skripsi Anda telah terbentuk dengan benar pada direktori `TME-CORE/data/`:

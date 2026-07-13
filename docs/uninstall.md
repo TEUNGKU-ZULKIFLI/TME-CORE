@@ -1,16 +1,7 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: night)" srcset="../assets/logos/TME-logo01.png" />
-    <img src="../assets/logos/TME-logo01.png" width="500" />
-  </picture>
-</p>
 <h1 align="center">
-  <span><b align="center">🗑️ UNINSTALLASI with TME-CORE</b></span>
+  <img src="https://img.shields.io/badge/🗑️_UNINSTALLASI_with-TME--CORE-red?style=for-the-bad" />
 </h1>
 
----
-
-# 🗑️ Panduan Penghapusan Sistem (Uninstall Guide)
 Dokumen ini memandu Anda untuk membersihkan sistem TME-CORE, berkas konfigurasi, serta aturan firewall pada router target secara aman dan menyeluruh.
 
 ## 🧹 Langkah 1: Menghapus Layanan di Server Debian

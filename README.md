@@ -1,27 +1,16 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: night)" srcset="../assets/logos/TME-logo01.png" />
+    <img src="assets/logos/TME-logo01.png" width="500" />
+  </picture>
+</p>
 <h1 align="center">
   <span><b align="center">TEUNGKU MITIGATION ENGINE - Core</b></span>
 </h1>
-<p align="center">
-<a href="./docs/install.md">
-  <img src="https://img.shields.io/badge/📥-Install-green?style=for-the-badge" />
-</a>
-<a href="./docs/getting_started.md">
-  <img src="https://img.shields.io/badge/🚀-Getting%20Started-blue?style=for-the-badge" />
-</a>
-<a href="./docs/uninstall.md">
-  <img src="https://img.shields.io/badge/🗑️-Uninstall-red?style=for-the-badge" />
-</a>
-<a href="./docs/troubleshooting.md">
-  <img src="https://img.shields.io/badge/🔧-Troubleshooting-orange?style=for-the-badge" />
-</a>
-</p>
 
----
-
-## TME-CORE (Teungku Mitigation Engine - Core)
 **TME-CORE** (*Teungku Mitigation Engine - Core*) adalah sebuah mesin mitigasi keamanan otonom berbasis External Controller (Python) yang dirancang untuk melindungi fungsionalitas Control Plane router MikroTik dari ancaman serangan brute force SSH (Port 22) dan FTP (Port 21).
 
-Proyek ini dibangun sebagai bagian dari penelitian tugas akhir/skripsi pada program studi **Teknologi Rekayasa Komputer Jaringan, Politeknik Negeri Lhokseumawe**.
+Proyek ini dibangun sebagai bagian dari penelitian tugas akhir/skripsi pada program studi [`Teknologi Rekayasa Komputer Jaringan`](https://trkj.pnl.ac.id/), [`Politeknik Negeri Lhokseumawe`](https://pnl.ac.id/).
 
 ## 💡 Kenapa Proyek Ini Penting & Berguna?
 Pada perangkat jaringan tingkat tepi (*edge router*) dengan sumber daya terbatas (seperti MikroTik hAP lite / [<kbd>`RB941-2nD-TC`](https://mikrotik.com/product/RB941-2nD-TC), memproses serangan *brute force* masif yang bertubi-tubi akan menyiksa CPU hingga mencapai **utilitas puncak 100%**. Skenario tanpa mitigasi ini berakibat fatal:</br>
@@ -39,7 +28,22 @@ TME-CORE memecahkan masalah ini dengan memindahkan beban kerja komputasi analiti
 
 ## 🚀 Bagaimana Saya Memulainya?
 Ikuti panduan langkah demi langkah di bawah ini untuk memasang dan menjalankan TME-CORE di lingkungan laboratorium atau jaringan produksi Anda.
+<p align="center">
+<a href="#install">
+  <img src="https://img.shields.io/badge/📥-Install-green?style=for-the-badge" />
+</a>
+<a href="#getting_started">
+  <img src="https://img.shields.io/badge/🚀-Getting%20Started-blue?style=for-the-badge" />
+</a>
+<a href="#troubleshooting">
+  <img src="https://img.shields.io/badge/🔧-Troubleshooting-orange?style=for-the-badge" />
+</a>
+<a href="#uninstall">
+  <img src="https://img.shields.io/badge/🗑️-Uninstall-red?style=for-the-badge" />
+</a>
+</p>
 
+<!--
 ### 📋 Prasyarat Sistem (Prerequisites)
 Sebelum melakukan pemasangan, pastikan infrastruktur Anda memenuhi kriteria berikut:</br>
 - **Perangkat Tepi:** Routerboard MikroTik (Teruji pada [<kbd>`RB941-2nD-TC`](https://mikrotik.com/product/RB941-2nD-TC), [<kbd>`RB750r2`](https://mikrotik.com/product/RB750r2), dan [<kbd>`RB951G-2HnD`](https://mikrotik.com/product/RB951G-2HnD) dengan RouterOS v6.x maupun v7.x).</br>
@@ -134,6 +138,7 @@ Untuk menjamin kesinambungan operasional 24 jam tanpa harus membiarkan sesi term
 	sudo journalctl -u tmecore.service -f
 	```
 
+-->
 ## 📈 Struktur Data Evaluasi
 Seluruh hasil pemantauan dan barang bukti eksperimen disimpan secara terpisah di dalam folder `/data` guna menunjang pengolahan statistik skripsi Anda:</br>
 - `/data/db/tme_state.json`: Menyimpan ingatan jangka panjang status kegagalan login dan IP terblokir (*State Persistence*).</br>
@@ -144,7 +149,7 @@ Seluruh hasil pemantauan dan barang bukti eksperimen disimpan secara terpisah di
 Kami sangat menyambut baik kontribusi untuk pengembangan sistem ke depan! Silakan baca [CONTRIBUTING](CONTRIBUTING.md) untuk detail panduan, penulisan kode (*SOP*), dan proses penyerahan *Pull Request*.
 
 ## 🏷️ Versi Rilis (Versioning)
-Sistem ini dikelola menggunakan skema penomoran versi [SemVer](https://semver.org/). Untuk melihat histori versi, perubahan fitur, dan rilis versi stabil, silakan kunjungi halaman [Releases](https://github.com/TEUNGKU-ZULKIFLI/TME-CORE/releases).
+Sistem ini dikelola menggunakan skema penomoran versi [SemVer](https://semver.org/). Untuk melihat histori versi, perubahan fitur, dan rilis versi stabil, silakan kunjungi halaman [Releases](/releases).
 
 ## 👨‍💻 Penulis (Authors)
 **Teungku Zulkifli** - *Pemilik Proyek & Penulis Utama* - [TEUNGKU-ZULKIFLI](https://teungku-zulkifli.github.io/)
