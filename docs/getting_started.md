@@ -106,3 +106,6 @@ Untuk menjamin TME-CORE tetap mengamankan jaringan Anda selama 24 jam tanpa haru
   ```
   sudo journalctl -u tmecore.service -f
   ```
+
+<h3>Systemd Daemon Cast</h3>
+<div id="systemd_daemon" class="cast-player"></div>

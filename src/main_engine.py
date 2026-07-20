@@ -21,7 +21,7 @@ from src.monitoring.evaluator_jalur_b import record_performance_to_csv
 from src.db.state_manager import load_state, save_state
 from src.detection.detector_jalur_b import check_active_session_anomalies
 
-failed_attempts, session_blocked_ips = load_state()
+failed_attempts, session_blocked_ips, total_attacks_detected, total_attacks_blocked = load_state()
 processed_log_ids = set()
 is_first_run = True
 last_cpu = 0
@@ -43,6 +43,7 @@ def write_system_log(message):
 
 def process_engine(api):
     global failed_attempts, processed_log_ids, is_first_run, last_cpu, last_ram, session_blocked_ips
+    global total_attacks_detected, total_attacks_blocked
 
     try:
         logs = api.get_resource('/log').get()
@@ -79,7 +80,8 @@ def process_engine(api):
                     failed_attempts[ip_attacker] = failed_attempts.get(ip_attacker, 0) + 1
                     print(f"[!] DETEKSI: Gagal login dari {ip_attacker} (Gagal ke-{failed_attempts[ip_attacker]})")
 
-                    save_state(failed_attempts, session_blocked_ips)
+                    # DATABASE UPDATE: Simpan ke JSON setiap kali jumlah gagal bertambah
+                    save_state(failed_attempts, session_blocked_ips, total_attacks_detected, total_attacks_blocked)
 
                     if failed_attempts[ip_attacker] == config.MAX_FAILED_ATTEMPTS - 1:
                          cpu, ram = record_performance_to_csv(api, ip_attacker, "SEDANG DISERANG")
@@ -89,26 +91,46 @@ def process_engine(api):
 
                     if failed_attempts[ip_attacker] >= config.MAX_FAILED_ATTEMPTS:
                         print(f"\033[91m[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada {ip_attacker}!\033[0m")
-                        write_system_log(f"Serangan brute force terdeteksi dari IP {ip_attacker}. Memicu aksi blokir.")
+
+                        # Identifikasi PORT layanan secara dinamis berdasarkan isi pesan log MikroTik
+                        if "ssh" in message:
+                            service_detected = "SSH (Port 22)"
+                        elif "ftp" in message:
+                            service_detected = "FTP (Port 21)"
+                        else:
+                            service_detected = "Unknown Protocol"
+
+                        write_system_log(f"Serangan brute force terdeteksi pada {service_detected} dari IP {ip_attacker}. Memicu aksi blokir.")
+
+                        # Naikkan counter total deteksi
+                        total_attacks_detected += 1
 
                         sukses = block_ip(api, ip_attacker)
 
                         if sukses:
-                            cpu, ram = record_performance_to_csv(api, ip_attacker, "BERHASIL DIBLOKIR")
+                            # Naikkan counter total blokir sukses
+                            total_attacks_blocked += 1
+
+                            cpu, ram = record_performance_to_csv(api, ip_attacker, f"BERHASIL DIBLOKIR ({service_detected})")
                             if cpu is not None:
                                 last_cpu = cpu
                                 last_ram = ram
 
+                            # Hitung nilai ADR secara dinamis (Terblokir / Terdeteksi)
+                            current_adr = (total_attacks_blocked / total_attacks_detected) * 100.0 if total_attacks_detected > 0 else 100.0
+
                             print("[*] Mengirim 1x laporan ke Telegram...")
-                            send_telegram_alert(ip_attacker, last_cpu, last_ram)
+                            send_telegram_alert(ip_attacker, last_cpu, last_ram, service=service_detected, adr=current_adr)
 
                             session_blocked_ips.add(ip_attacker)
+                            # Hapus dari daftar gagal, karena sudah masuk daftar blokir
                             del failed_attempts[ip_attacker]
 
-                            save_state(failed_attempts, session_blocked_ips)
+                            # DATABASE UPDATE: Simpan perubahan final ke JSON
+                            save_state(failed_attempts, session_blocked_ips, total_attacks_detected, total_attacks_blocked)
+
             processed_log_ids.add(log_id)
             check_active_session_anomalies(api, failed_attempts, session_blocked_ips)
-
     except Exception as e:
         print(f"[-] Error pada Main Engine: {e}")
         write_system_log(f"ENGINE ERROR: {e}")

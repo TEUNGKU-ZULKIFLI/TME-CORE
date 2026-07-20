@@ -5,10 +5,11 @@
 import requests
 from config import config
 
-def send_telegram_alert(ip_attacker, cpu_load, sisa_ram, custom_message=None):
+def send_telegram_alert(ip_attacker, cpu_load, sisa_ram, service="SSH (Port 22)", adr=100.0, custom_message=None):
     """
     Mengirimkan pesan peringatan mitigasi otomatis dengan visualisasi
     yang kontras dan terstruktur menggunakan parsing HTML.
+    Mendukung info PORT layanan yang diserang dan nilai ADR sistem.
     Mendukung pengiriman pesan kustom untuk anomali Jalur B.
     """
     if not config.TELEGRAM_TOKEN or not config.TELEGRAM_CHAT_ID:
@@ -33,7 +34,9 @@ def send_telegram_alert(ip_attacker, cpu_load, sisa_ram, custom_message=None):
             f"───────────────────────────\n\n"
             f"🚨 <b>SERANGAN BRUTE FORCE DIBLOKIR!</b>\n"
             f"📌 <b>IP Penyerang :</b> <code>{ip_attacker}</code>\n"
-            f"⚡ <b>Status Aksi   :</b> <code>DROP (Blacklisted)</code>\n\n"
+            f"🌐 <b>Layanan/Port  :</b> <code>{service}</code>\n"
+            f"⚡ <b>Status Aksi   :</b> <code>DROP (Blacklisted)</code>\n"
+            f"🎯 <b>Sistem ADR    :</b> <code>{adr:.1f}%</code>\n\n"
             f"📊 <b>METRIK SUMBER DAYA ROUTER:</b>\n"
             f"  ├─ Beban CPU : {cpu_load}% {cpu_bar}\n"
             f"  └─ Sisa RAM  : {sisa_ram:.2f} MB / 32.00 MB\n\n"

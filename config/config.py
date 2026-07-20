@@ -30,7 +30,7 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 
 # 4. Parameter Threshold
 MAX_FAILED_ATTEMPTS = 10
-BLOCK_TIMEOUT = "1h"
+BLOCK_TIMEOUT = "10h"
 ADDRESS_LIST_NAME = "brute_force_block"
 MAX_CPU_USAGE = 80
 MAX_RAM_USAGE = 90

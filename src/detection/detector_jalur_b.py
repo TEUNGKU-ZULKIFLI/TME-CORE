@@ -37,15 +37,12 @@ def check_active_session_anomalies(api, failed_attempts, session_blocked_ips):
                 continue
 
             # 2. DETEKSI ANOMALI:
-            # Jika IP tersebut terdaftar aktif login, namun memiliki riwayat gagal login sebelumnya
             if ip_clean in failed_attempts and failed_attempts[ip_clean] > 0:
                 print(f"\033[91m[🚨 ANOMALI DETECTED]: IP {ip_clean} berhasil masuk sebagai '{username}' via {via_service}")
                 print(f"                       setelah mengalami {failed_attempts[ip_clean]} kegagalan!\033[0m")
-
-                # DEFENSIVE STEP: Langsung amankan Firewall & reset hitungan gagal untuk mencegah looping tak terbatas
                 print(f"[*] DEFENSIVE ACTION: Memblokir IP {ip_clean} di Firewall Address List...")
                 sukses_blokir = block_ip(api, ip_clean)
-                
+
                 if sukses_blokir:
                     session_blocked_ips.add(ip_clean)
                     failed_count_temp = failed_attempts[ip_clean] # Simpan histori untuk alert telegram
@@ -56,7 +53,7 @@ def check_active_session_anomalies(api, failed_attempts, session_blocked_ips):
 
                 active_resource = api.get_resource('/user/active')
                 session_kicked = False
-                
+
                 try:
                     # Skenario 1: Coba request-logout (Standar RouterOS v6.x & v7.x < 7.20)
                     active_resource.call('request-logout', {'numbers': session_id})
@@ -64,7 +61,7 @@ def check_active_session_anomalies(api, failed_attempts, session_blocked_ips):
                     session_kicked = True
                 except Exception as e_logout:
                     err_msg = str(e_logout).lower()
-                    
+
                     # Jika Skenario 1 ditolak API karena limitasi RouterOS v6.x / v7.x
                     if "no such command" in err_msg or "not found" in err_msg or "unknown" in err_msg:
                         try:
@@ -77,15 +74,13 @@ def check_active_session_anomalies(api, failed_attempts, session_blocked_ips):
                             print(f"[*] INFO: Mencoba Skenario 3 (Dynamic Scripting Injection) untuk RouterOS v6.x...")
                             script_resource = api.get_resource('/system/script')
                             script_name = f"tme_kick_{int(time.time())}"
-                            
-                            # SOLUSI SINTAKS: Loop foreach yang kompatibel 100% dengan MikroTik CLI v6 (Wajib menggunakan Slashed Paths)
                             script_source = (
                                 f':foreach i in=[/user/active/find] do={{'
                                 f':local addr [/user/active/get $i address]; '
-                                f':if ($addr ~ "{ip_clean}") do={{/user/active/request-logout $i}}'
+                                f':if ($addr ~ "{ip_clean}") do={{/user/active/request-logout numbers=$i}}'
                                 f'}}'
                             )
-                            
+
                             try:
                                 # A. Tambahkan script bypass sementara ke router
                                 script_resource.add(
@@ -93,7 +88,7 @@ def check_active_session_anomalies(api, failed_attempts, session_blocked_ips):
                                     source=script_source,
                                     policy="read,write,policy,test"
                                 )
-                                
+
                                 # B. Jalankan script dalam try-finally block agar pembersihan script dijamin berjalan
                                 try:
                                     script_resource.call('run', {'number': script_name})
@@ -105,32 +100,45 @@ def check_active_session_anomalies(api, failed_attempts, session_blocked_ips):
                                     if script_to_remove:
                                         script_resource.remove(id=script_to_remove[0]['id'])
                                         print("[*] JALUR B: Pembersihan script sementara berhasil dilakukan.")
-                                        
+
                             except Exception as e_script:
                                 print(f"[-] ERROR UTAMA MITIGASI JALUR B (Skenario 3 Gagal): {e_script}")
                     else:
                         print(f"[-] ERROR REQUEST-LOGOUT JALUR B: {e_logout}")
 
-                # D. Ekstrak beban Router & Tulis ke CSV (Kinerja)
+                # D. Deteksi tipe port layanan secara dinamis untuk laporan
+                service_detected = "Unknown Service"
+                if via_service == "ssh":
+                    service_detected = "SSH (Port 22)"
+                elif via_service == "ftp":
+                    service_detected = "FTP (Port 21)"
+                else:
+                    service_detected = f"{via_service.upper()}"
+
+                # E. Ekstrak beban Router & Tulis ke CSV (Kinerja)
                 last_cpu, last_ram = 100, 8.0
                 if sukses_blokir:
-                    status_metrics = "BYPASS BLOCKED JALUR B" if session_kicked else "BYPASS BLOCKED (KICK FAILED)"
+                    status_metrics = f"BYPASS BLOCKED JALUR B ({service_detected})" if session_kicked else "BYPASS BLOCKED (KICK FAILED)"
                     cpu, ram = record_performance_to_csv(api, ip_clean, status_metrics)
                     if cpu is not None:
                         last_cpu = cpu
                         last_ram = ram
 
-                # E. Kirim Notifikasi Telegram Khusus Anomali
+                # F. Kirim Notifikasi Telegram Khusus Anomali
                 status_mitigasi = "SESSION KICK & BLACKLIST DROP" if session_kicked else "BLACKLIST DROP ONLY (Kick Failed)"
-                
+
                 pesan_alert = (
                     f"🚨 <b>TME-CORE ANOMALY ALERT</b>\n"
-                    f"───────────────────────────\n"
+                    f"───────────────────────────\n\n"
                     f"📌 <b>IP Penyerang</b> : <code>{ip_clean}</code>\n"
-                    f"🔑 <b>Username</b>    : <code>{username}</code>\n"
-                    f"🛡️ <b>Status</b>      : BERHASIL LOGIN BYPASS (Anomali)\n"
+                    f"🌐 <b>Layanan/Port</b>  : <code>{service_detected}</code>\n"
+                    f"🔑 <b>Username</b>     : <code>{username}</code>\n"
+                    f"🛡️ <b>Status</b>       : BERHASIL LOGIN BYPASS (Anomali)\n"
                     f"⚡ <b>Aksi Mitigasi</b>: <code>{status_mitigasi}</code>\n"
-                    f"📈 <b>Riwayat Gagal</b> : {failed_count_temp} kali\n"
+                    f"📈 <b>Riwayat Gagal</b> : {failed_count_temp} kali\n\n"
+                    f"📊 <b>METRIK SUMBER DAYA ROUTER:</b>\n"
+                    f"  ├─ Beban CPU : {last_cpu}% (CRITICAL)\n"
+                    f"  └─ Sisa RAM  : {last_ram:.2f} MB / 32.00 MB\n\n"
                     f"───────────────────────────\n"
                     f"📅 <i>Dilaporkan secara real-time oleh Jalur B Engine</i>"
                 )
