@@ -16,7 +16,6 @@ class Colors:
     RESET = '\033[0m'
 
 def print_banner():
-    """Mencetak ASCII Art yang elegan layaknya tools Hacking/DevOps"""
     os.system('clear' if os.name == 'posix' else 'cls') # Bersihkan layar
 
     banner = f"""{Colors.CYAN}{Colors.BOLD}
@@ -33,10 +32,6 @@ def print_banner():
     print(f"{Colors.CYAN}{'=' * 65}{Colors.RESET}")
 
 def run_doctor(env_path, data_dir, config_module):
-    """
-    Melakukan Pre-Flight Check
-    sebelum Engine benar-benar berjalan.
-    """
     print(f"\n{Colors.BOLD}🔍 Menjalankan TME-CORE Doctor...{Colors.RESET}")
     time.sleep(0.5)
 

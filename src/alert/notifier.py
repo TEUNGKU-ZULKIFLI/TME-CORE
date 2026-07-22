@@ -6,12 +6,7 @@ import requests
 from config import config
 
 def send_telegram_alert(ip_attacker, cpu_load, sisa_ram, service="SSH (Port 22)", adr=100.0, custom_message=None):
-    """
-    Mengirimkan pesan peringatan mitigasi otomatis dengan visualisasi
-    yang kontras dan terstruktur menggunakan parsing HTML.
-    Mendukung info PORT layanan yang diserang dan nilai ADR sistem.
-    Mendukung pengiriman pesan kustom untuk anomali Jalur B.
-    """
+
     if not config.TELEGRAM_TOKEN or not config.TELEGRAM_CHAT_ID:
         print("[-] NOTIFIKASI: Token Telegram atau Chat ID belum dikonfigurasi.")
         return False

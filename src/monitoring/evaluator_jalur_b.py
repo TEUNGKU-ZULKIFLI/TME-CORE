@@ -8,7 +8,6 @@ import datetime
 from config import config
 
 def init_metrics_csv():
-    """Memastikan file CSV memiliki header kolom yang benar saat pertama kali dibuat"""
     if not os.path.exists(config.METRICS_CSV_PATH):
         try:
             with open(config.METRICS_CSV_PATH, mode='w', newline='', encoding='utf-8') as f:
@@ -26,7 +25,6 @@ def init_metrics_csv():
             print(f"[-] METRICS ERROR: Gagal membuat file CSV: {e}")
 
 def record_performance_to_csv(api, attacker_ip, action_taken):
-    """Mengambil metrics dari MikroTik dan langsung mengekspornya ke file CSV"""
     # Pastikan header sudah siap
     init_metrics_csv()
 

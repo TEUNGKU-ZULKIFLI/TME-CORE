@@ -30,36 +30,26 @@ class Colors:
     RESET = '\033[0m'
 
 def ping_test(ip_target, count=5):
-    """
-    Melakukan ICMP Ping ke MikroTik untuk mendapatkan data Latency & Packet Loss.
-    Mengekstrak output ping Linux Debian menggunakan Regex.
-    """
     try:
         # Menjalankan perintah ping di Linux Debian
         # ping -c 5 -W 1 <ip> -> kirim 5 paket, timeout 1 detik
         cmd = ["ping", "-c", str(count), "-W", "1", ip_target]
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=7)
-        
         output = result.stdout
         if not output:
             return 999.0, 100.0  # Latency tinggi, Loss 100% jika rute putus
-            
         # 1. Ekstraksi Packet Loss (%) menggunakan Regex
         # Contoh output Linux: "5 packets transmitted, 5 received, 0% packet loss, time 4004ms"
         loss_match = re.search(r'(\d+)%\s+packet\s+loss', output)
         packet_loss = float(loss_match.group(1)) if loss_match else 0.0
-        
         # 2. Ekstraksi Latency (Average RTT dalam ms)
         # Contoh output Linux: "rtt min/avg/max/mdev = 1.121/1.520/2.299/0.463 ms"
         rtt_match = re.search(r'rtt\s+min/avg/max/mdev\s+=\s+([\d\.]+)/([\d\.]+)/([\d\.]+)/([\d\.]+)', output)
         avg_latency = float(rtt_match.group(2)) if rtt_match else 0.0
-        
         # Jika loss 100%, set Latency ke nilai penanda (misal 0 atau 999)
         if packet_loss == 100.0:
             avg_latency = 999.0
-            
         return avg_latency, packet_loss
-        
     except subprocess.TimeoutExpired:
         return 999.0, 100.0
     except Exception as e:
@@ -67,31 +57,21 @@ def ping_test(ip_target, count=5):
         return 0.0, 0.0
 
 def record_data_to_csv(filepath, record_no, cpu_load, ram_usage, latency, loss):
-    """
-    Menyimpan metrik ke file CSV yang ditentukan secara aman dan terstruktur.
-    """
     # Memastikan folder direktori CSV ada
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    
     file_exists = os.path.exists(filepath)
-    
     try:
         with open(filepath, mode='a', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
             # Tulis header jika file baru dibuat
             if not file_exists:
                 writer.writerow(["No", "Timestamp", "CPU (%)", "RAM (%)", "Latency (ms)", "Packet Loss (%)"])
-            
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             writer.writerow([record_no, timestamp, cpu_load, ram_usage, f"{latency:.3f}", f"{loss:.1f}"])
-            
     except Exception as e:
         print(f"{Colors.RED}[-] Gagal menulis data ke CSV: {e}{Colors.RESET}")
 
 def select_test_scenario():
-    """
-    Menu Interaktif untuk memilih 1 dari 3 skenario pencatatan data skripsi.
-    """
     print_banner()
     print(f"{Colors.CYAN}🎯 MONITORING & DATA COLLECTOR BAB IV - TME-CORE{Colors.RESET}")
     print("=" * 65)
@@ -100,7 +80,6 @@ def select_test_scenario():
     print(f" [{Colors.GREEN}2{Colors.RESET}] Simulasi Serangan & Pencatatan  -> (data_serangan.csv)")
     print(f" [{Colors.GREEN}3{Colors.RESET}] Pengujian Repetisi Sistem       -> (data_repetisi.csv)")
     print("-----------------------------------------------------------------")
-    
     while True:
         pilihan = input("Masukkan nomor pilihan (1/2/3): ").strip()
         if pilihan == '1':
@@ -114,10 +93,8 @@ def select_test_scenario():
 
 def main():
     csv_file, skenario_name = select_test_scenario()
-    
     print(f"\n{Colors.YELLOW}[*] Menghubungkan ke RouterOS MikroTik API...{Colors.RESET}")
     api_conn, pool = connect_to_mikrotik()
-    
     if not api_conn:
         print(f"{Colors.RED}[-] Koneksi gagal. Mohon periksa kembali status router.{Colors.RESET}")
         return
@@ -128,7 +105,6 @@ def main():
     print("=" * 65)
     print(f"Memulai pemantauan. Tekan {Colors.RED}Ctrl+C{Colors.RESET} untuk menghentikan rekaman.")
     print("-" * 65)
-    
     record_no = 1
     try:
         while True:
@@ -140,7 +116,6 @@ def main():
                     cpu_load = int(resource_data.get('cpu-load', 0))
                     free_mem = int(resource_data.get('free-memory', 0))
                     total_mem = int(resource_data.get('total-memory', 1))
-                    
                     used_mem = total_mem - free_mem
                     ram_percent = int((used_mem / total_mem) * 100)
                 else:
@@ -148,10 +123,8 @@ def main():
             except Exception as e:
                 print(f"{Colors.RED}[-] API Gagal mengambil resource: {e}{Colors.RESET}")
                 cpu_load, ram_percent = 0, 0
-                
             # 2. Ambil data Latency & Loss via Ping dari Debian ke MikroTik
             latency, loss = ping_test(config.MIKROTIK_IP, count=5)
-            
             # 3. Tampilkan secara real-time di CLI
             timestamp = datetime.datetime.now().strftime("%H:%M:%S")
             print(f"[{timestamp}] #{record_no:03d} | "
@@ -159,13 +132,10 @@ def main():
                   f"RAM: {ram_percent:2d}% | "
                   f"Latency: {latency:6.3f} ms | "
                   f"Loss: {loss:5.1f}%")
-            
             # 4. Simpan data secara rapi ke file CSV tujuan
             record_data_to_csv(csv_file, record_no, cpu_load, ram_percent, latency, loss)
-            
             record_no += 1
             time.sleep(3)  # Interval pengujian 3 detik sekali
-            
     except KeyboardInterrupt:
         print(f"\n{Colors.YELLOW}[*] Perekaman dihentikan oleh Administrator.{Colors.RESET}")
         print(f"{Colors.GREEN}[✓] Seluruh data berhasil diekspor dengan aman ke {csv_file}!{Colors.RESET}")

@@ -7,10 +7,7 @@ import routeros_api
 from src.cli.console import print_banner
 
 def connect_to_mikrotik():
-    """
-    Fungsi ini bertugas membuka jalur API ke MikroTik.
-    Return: object koneksi (api) jika sukses, None jika gagal.
-    """
+
     try:
         # Inisialisasi parameter koneksi
         connection = routeros_api.RouterOsApiPool(
@@ -32,9 +29,6 @@ def connect_to_mikrotik():
         return None, None
 
 def disconnect_from_mikrotik(connection_pool):
-    """
-    Fungsi untuk menutup koneksi agar CPU MikroTik tidak penuh (Memory Leak)
-    """
     if connection_pool:
         connection_pool.disconnect()
         print("[*] Koneksi ke MikroTik ditutup dengan aman.")

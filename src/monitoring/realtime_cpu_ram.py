@@ -8,9 +8,6 @@ from src.api.connection import connect_to_mikrotik, disconnect_from_mikrotik
 from src.cli.console import print_banner
 
 def check_router_load(api):
-    """
-    Mengambil data penggunaan CPU dan Memory dari MikroTik.
-    """
     try:
         # Ambil data dari /system/resource
         resources = api.get_resource('/system/resource').get()

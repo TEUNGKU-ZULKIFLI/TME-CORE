@@ -5,10 +5,6 @@
 from config import config
 
 def block_ip(api, ip_address):
-    """
-    Memasukkan IP penyerang ke dalam Address List MikroTik
-    untuk di-drop oleh Firewall.
-    """
     try:
         address_list = api.get_resource('/ip/firewall/address-list')
 
