@@ -30,12 +30,13 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 
 # 4. Parameter Threshold
 MAX_FAILED_ATTEMPTS = 10
-BLOCK_TIMEOUT = "10h"
+BLOCK_TIMEOUT = "24h"
 ADDRESS_LIST_NAME = "brute_force_block"
 MAX_CPU_USAGE = 80
 MAX_RAM_USAGE = 90
 
 DATA_DIR = os.path.join(BASE_DIR, "data")
+STATE_RETENTION_SECONDS = int(os.getenv("STATE_RETENTION_SECONDS", 3600))  # retention for persisted failure counts (seconds)
 DB_DIR = os.path.join(DATA_DIR, "db")
 LOGS_DIR = os.path.join(DATA_DIR, "logs")
 METRICS_DIR = os.path.join(DATA_DIR, "metrics")

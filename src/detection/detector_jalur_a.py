@@ -1,81 +1,107 @@
 # ==========================================
 # FILE: src/detection/detector_jalur_a.py
-# FUNGSI: Jalur A - Mendeteksi log Brute Force
+# FUNGSI: Jalur A - Mendeteksi log Brute Force (menggunakan failed_attempts eksternal)
 # ==========================================
-import re
 import time
-from config import config
-from src.api.connection import connect_to_mikrotik, disconnect_from_mikrotik
-from src.firewall.mitigator_jalur_a import block_ip
+from typing import Dict, Any, Optional, List
 
-failed_attempts = {}
-processed_log_ids = set()
-is_first_run = True
+class DetectorJalurA:
+    def __init__(self, whitelist_ips: List[str], max_failed_attempts: int = 5, time_window_seconds: int = 60):
+        """
+        Inisialisasi Detektor Jalur A.
+        failed_attempts diharapkan dikelola sebagai struktur eksternal: dict[ip] -> List[timestamp]
+        """
+        self.whitelist_ips = set(whitelist_ips)
+        self.max_failed_attempts = max_failed_attempts
+        self.time_window_seconds = time_window_seconds
 
-def extract_ip(log_message):
-    match = re.search(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b', log_message)
-    return match.group(0) if match else None
+    def _prune(self, lst: List[float]) -> List[float]:
+        now = time.time()
+        return [t for t in lst if (now - t) <= self.time_window_seconds]
 
-def process_logs(api):
-    global failed_attempts, processed_log_ids, is_first_run
+    def analyze_log(self, parsed_log: Dict[str, Any], failed_attempts: Dict[str, List[float]], persistent_failed_counts: Dict[str, dict] = None) -> Optional[Dict[str, Any]]:
+        """
+        Menganalisis satu log terstruktur. Mutates failed_attempts in-place untuk kasus FAILED.
+        Diperbarui: menerima persistent_failed_counts untuk mendukung carry-over across restarts.
 
-    try:
-        logs = api.get_resource('/log').get()
+        Skema:
+        - Jika IP ada di whitelist -> None
+        - Jika status == 'FAILED' -> append timestamp ke failed_attempts[ip], prune, cek (len(lst) + persistent_count) >= threshold -> reset dan return BRUTE_FORCE
+        - Jika status == 'SUCCESS' -> jika ada histori gagal recent -> return UNAUTHORIZED_SUCCESS threat
+        """
+        if not parsed_log:
+            return None
 
-        # Jika baru pertama kali nyala, cukup catat ID-nya saja (Skip processing)
-        if is_first_run:
-            for log in logs:
-                log_id = log.get('id')
-                if log_id:
-                    processed_log_ids.add(log_id)
-            print(f"[*] Memori disiapkan. Mengabaikan {len(processed_log_ids)} log lama.")
-            is_first_run = False
-            return
+        ip = parsed_log.get('ip')
+        status = parsed_log.get('status')
+        service = parsed_log.get('service')
+        username = parsed_log.get('username')
 
-        # Untuk proses selanjutnya (Deteksi Real-Time)
-        for log in logs:
-            log_id = log.get('id')
-            message = str(log.get('message', '')).lower()
+        if not ip:
+            return None
 
-            # Jika log sudah pernah diproses, lewati
-            if log_id in processed_log_ids or not log_id:
-                continue
+        # Abaikan whitelist
+        if ip in self.whitelist_ips:
+            return None
 
-            # Filter log Brute Force
-            if "login failure" in message:
-                ip_attacker = extract_ip(message)
+        # Ensure persistent_failed_counts shape
+        if persistent_failed_counts is None:
+            persistent_failed_counts = {}
 
-                if ip_attacker:
-                    failed_attempts[ip_attacker] = failed_attempts.get(ip_attacker, 0) + 1
-                    print(f"[!] DETEKSI: Gagal login dari {ip_attacker} (Gagal ke-{failed_attempts[ip_attacker]})")
+        # SUCCESS case: jika ada histori gagal recent => UNAUTHORIZED_SUCCESS
+        if status == 'SUCCESS':
+            hist = failed_attempts.get(ip, [])
+            if not isinstance(hist, list):
+                hist = []
+            hist = self._prune(hist)
+            failed_attempts[ip] = hist
 
-                    # Jika mencapai threshold
-                    if failed_attempts[ip_attacker] >= config.MAX_FAILED_ATTEMPTS:
-                        print(f"[>>>] THRESHOLD TERCAPAI: Melakukan pemblokiran pada {ip_attacker}!")
+            persistent_entry = persistent_failed_counts.get(ip, {'count': 0, 'last': 0})
+            persistent_count = int(persistent_entry.get('count', 0)) if isinstance(persistent_entry.get('count', 0), int) else 0
 
-                        # ---> EKSEKUSI JALUR A (MITIGASI) <---
-                        sukses = block_ip(api, ip_attacker)
+            total_recent = len(hist) + persistent_count
+            if total_recent > 0:
+                # leave cleanup to caller after mitigation, but return threat
+                return {
+                    'threat_type': 'UNAUTHORIZED_SUCCESS',
+                    'severity': 'CRITICAL',
+                    'ip': ip,
+                    'service': service,
+                    'username': username,
+                    'message': f"🚨 CRITICAL ALERT: IP {ip} berhasil login via {service} setelah {total_recent} kegagalan!",
+                    'failed_count': total_recent
+                }
+            return None
 
-                        if sukses:
-                            # Hapus dari memori agar perhitungan dimulai dari 0 lagi jika timeout blokir habis
-                            del failed_attempts[ip_attacker]
+        # FAILED case: tambahkan timestamp dan periksa ambang
+        if status == 'FAILED':
+            now = time.time()
+            lst = failed_attempts.get(ip, [])
+            if not isinstance(lst, list):
+                lst = []
+            lst.append(now)
+            lst = self._prune(lst)
+            failed_attempts[ip] = lst
 
-            # Tandai log ini sudah dibaca
-            processed_log_ids.add(log_id)
+            persistent_entry = persistent_failed_counts.get(ip, {'count': 0, 'last': 0})
+            persistent_count = int(persistent_entry.get('count', 0)) if isinstance(persistent_entry.get('count', 0), int) else 0
 
-    except Exception as e:
-        print(f"[-] Error saat membaca log: {e}")
+            total_recent = len(lst) + persistent_count
 
-# --- Main Program Jalur A ---
-if __name__ == "__main__":
-    api_conn, pool = connect_to_mikrotik()
-    if api_conn:
-        print("[-] TME-CORE (JALUR A) AKTIF: Menunggu serangan masuk...")
-        try:
-            while True:
-                process_logs(api_conn)
-                time.sleep(2) # Polling lebih cepat (2 detik)
-        except KeyboardInterrupt:
-            print("\n[*] Pemantauan dihentikan user.")
-        finally:
-            disconnect_from_mikrotik(pool)
+            if total_recent >= self.max_failed_attempts:
+                # reset history agar tidak memicu berulang
+                failed_attempts[ip] = []
+                # also reset persistent counter (caller should persist save_state after mitigation)
+                persistent_failed_counts[ip] = {'count': 0, 'last': 0}
+                return {
+                    'threat_type': 'BRUTE_FORCE',
+                    'severity': 'HIGH',
+                    'ip': ip,
+                    'service': service,
+                    'username': username,
+                    'failed_count': total_recent,
+                    'threshold_limit': self.max_failed_attempts,
+                    'message': f"⚠️ BRUTE_FORCE: IP {ip} mencapai {total_recent}/{self.max_failed_attempts} percobaan via {service}!"
+                }
+
+        return None

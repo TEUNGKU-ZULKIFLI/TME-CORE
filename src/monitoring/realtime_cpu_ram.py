@@ -3,7 +3,7 @@
 # FUNGSI: Monitoring Realtime CPU dan Memory dari MikroTik
 # ==========================================
 import time
-from config import config
+from config.config import MAX_CPU_USAGE
 from src.api.connection import connect_to_mikrotik, disconnect_from_mikrotik
 from src.cli.console import print_banner
 
@@ -29,7 +29,7 @@ def check_router_load(api):
         print(f"[*] BEBAN ROUTER -> CPU: {cpu_load}% | RAM: {ram_usage_percent}%")
 
         # Jika CPU melonjak drastis akibat Brute Force atau hal mencurigakan
-        if cpu_load >= config.MAX_CPU_USAGE:
+        if cpu_load >= MAX_CPU_USAGE:
             print(f"[!!!] PERINGATAN: CPU Overload ({cpu_load}%)!")
             print("[!] Indikasi serangan masif atau aktivitas anomali sedang terjadi.")
 
@@ -44,7 +44,7 @@ def check_router_load(api):
         return cpu_load, ram_usage_percent
 
     except Exception as e:
-        print(f"[-] Error saat membaca system resource: {e}")
+        print(f"[✗] Error saat membaca system resource: {e}")
         return None, None
 
 if __name__ == "__main__":
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     print_banner()
     api_conn, pool = connect_to_mikrotik()
     if api_conn:
-        print("[-] TME-CORE REAL TIME AKTIF: Memonitor Beban Router...")
+        print("[!] TME-CORE REAL TIME AKTIF: Memonitor Beban Router...")
         try:
             while True:
                 check_router_load(api_conn)

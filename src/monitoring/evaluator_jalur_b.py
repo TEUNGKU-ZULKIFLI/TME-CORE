@@ -5,12 +5,12 @@
 import os
 import csv
 import datetime
-from config import config
+from config.config import METRICS_CSV_PATH
 
 def init_metrics_csv():
-    if not os.path.exists(config.METRICS_CSV_PATH):
+    if not os.path.exists(METRICS_CSV_PATH):
         try:
-            with open(config.METRICS_CSV_PATH, mode='w', newline='', encoding='utf-8') as f:
+            with open(METRICS_CSV_PATH, mode='w', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
                 writer.writerow([
                     "Timestamp",
@@ -20,9 +20,9 @@ def init_metrics_csv():
                     "Sisa RAM (MB)",
                     "Total RAM (MB)"
                 ])
-            print(f"[+] METRICS: File CSV berhasil diinisialisasi di {config.METRICS_CSV_PATH}")
+            print(f"[✓] METRICS: File CSV berhasil diinisialisasi di {METRICS_CSV_PATH}")
         except Exception as e:
-            print(f"[-] METRICS ERROR: Gagal membuat file CSV: {e}")
+            print(f"[✗] METRICS ERROR: Gagal membuat file CSV: {e}")
 
 def record_performance_to_csv(api, attacker_ip, action_taken):
     # Pastikan header sudah siap
@@ -41,7 +41,7 @@ def record_performance_to_csv(api, attacker_ip, action_taken):
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # Tulis baris baru ke CSV
-        with open(config.METRICS_CSV_PATH, mode='a', newline='', encoding='utf-8') as f:
+        with open(METRICS_CSV_PATH, mode='a', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
             writer.writerow([
                 timestamp,
@@ -52,9 +52,9 @@ def record_performance_to_csv(api, attacker_ip, action_taken):
                 f"{total_memory:.2f}"
             ])
 
-        print(f"[*] METRICS RECORDED: {action_taken} | CPU: {cpu_load}% | Sisa RAM: {free_memory:.2f}MB")
+        print(f"[✓] METRICS RECORDED: {action_taken} | CPU: {cpu_load}% | Sisa RAM: {free_memory:.2f}MB")
         return cpu_load, free_memory
 
     except Exception as e:
-        print(f"[-] METRICS ERROR: Gagal mencatat beban router ke CSV: {e}")
+        print(f"[✗] METRICS ERROR: Gagal mencatat beban router ke CSV: {e}")
         return None, None

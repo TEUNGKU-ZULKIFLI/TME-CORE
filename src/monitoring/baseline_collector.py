@@ -16,7 +16,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 if BASE_DIR not in sys.path:
     sys.path.append(BASE_DIR)
 
-from config import config
+from config.config import DATA_DIR, MIKROTIK_IP
 from src.api.connection import connect_to_mikrotik, disconnect_from_mikrotik
 from src.cli.console import print_banner
 
@@ -69,7 +69,7 @@ def record_data_to_csv(filepath, record_no, cpu_load, ram_usage, latency, loss):
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             writer.writerow([record_no, timestamp, cpu_load, ram_usage, f"{latency:.3f}", f"{loss:.1f}"])
     except Exception as e:
-        print(f"{Colors.RED}[-] Gagal menulis data ke CSV: {e}{Colors.RESET}")
+        print(f"{Colors.RED}[✗] Gagal menulis data ke CSV: {e}{Colors.RESET}")
 
 def select_test_scenario():
     print_banner()
@@ -83,23 +83,23 @@ def select_test_scenario():
     while True:
         pilihan = input("Masukkan nomor pilihan (1/2/3): ").strip()
         if pilihan == '1':
-            return os.path.join(config.DATA_DIR, "metrics", "data_normal.csv"), "KONDISI NORMAL"
+            return os.path.join(DATA_DIR, "metrics", "data_normal.csv"), "KONDISI NORMAL"
         elif pilihan == '2':
-            return os.path.join(config.DATA_DIR, "metrics", "data_serangan.csv"), "SIMULASI SERANGAN"
+            return os.path.join(DATA_DIR, "metrics", "data_serangan.csv"), "SIMULASI SERANGAN"
         elif pilihan == '3':
-            return os.path.join(config.DATA_DIR, "metrics", "data_repetisi.csv"), "REPETISI SISTEM"
+            return os.path.join(DATA_DIR, "metrics", "data_repetisi.csv"), "REPETISI SISTEM"
         else:
-            print(f"{Colors.RED}[!] Input tidak valid. Masukkan angka 1, 2, atau 3.{Colors.RESET}")
+            print(f"{Colors.RED}[✗] Input tidak valid. Masukkan angka 1, 2, atau 3.{Colors.RESET}")
 
 def main():
     csv_file, skenario_name = select_test_scenario()
     print(f"\n{Colors.YELLOW}[*] Menghubungkan ke RouterOS MikroTik API...{Colors.RESET}")
     api_conn, pool = connect_to_mikrotik()
     if not api_conn:
-        print(f"{Colors.RED}[-] Koneksi gagal. Mohon periksa kembali status router.{Colors.RESET}")
+        print(f"{Colors.RED}[✗] Koneksi gagal. Mohon periksa kembali status router.{Colors.RESET}")
         return
 
-    print(f"{Colors.GREEN}[✓] SUKSES: Terhubung ke {config.MIKROTIK_IP}{Colors.RESET}")
+    print(f"{Colors.GREEN}[✓] SUKSES: Terhubung ke {MIKROTIK_IP}{Colors.RESET}")
     print(f"[🛡️] Skenario Aktif: {Colors.BOLD}{skenario_name}{Colors.RESET}")
     print(f"[📂] File Output   : {Colors.CYAN}{csv_file}{Colors.RESET}")
     print("=" * 65)
@@ -121,10 +121,10 @@ def main():
                 else:
                     cpu_load, ram_percent = 0, 0
             except Exception as e:
-                print(f"{Colors.RED}[-] API Gagal mengambil resource: {e}{Colors.RESET}")
+                print(f"{Colors.RED}[✗] API Gagal mengambil resource: {e}{Colors.RESET}")
                 cpu_load, ram_percent = 0, 0
             # 2. Ambil data Latency & Loss via Ping dari Debian ke MikroTik
-            latency, loss = ping_test(config.MIKROTIK_IP, count=5)
+            latency, loss = ping_test(MIKROTIK_IP, count=5)
             # 3. Tampilkan secara real-time di CLI
             timestamp = datetime.datetime.now().strftime("%H:%M:%S")
             print(f"[{timestamp}] #{record_no:03d} | "
