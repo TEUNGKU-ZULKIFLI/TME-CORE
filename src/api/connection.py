@@ -8,10 +8,6 @@ from src.cli.console import print_banner
 
 
 def connect_to_mikrotik():
-    """Mencoba membuat koneksi ke RouterOS via routeros_api.
-
-    Mengembalikan tuple (api, connection_pool) atau (None, None) jika gagal.
-    """
     try:
         # Inisialisasi parameter koneksi menggunakan kredensial dari config
         connection = routeros_api.RouterOsApiPool(

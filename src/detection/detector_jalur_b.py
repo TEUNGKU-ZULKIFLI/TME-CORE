@@ -12,17 +12,6 @@ _mitigator = MitigatorJalurA()
 
 
 def check_active_session_anomalies(api, failed_attempts, session_blocked_ips, persistent_failed_counts=None, notifier=None):
-    """
-    Memeriksa sesi aktif di RouterOS. Jika ditemukan sesi yang berhasil login
-    setelah beberapa kegagalan (dalam memori failed_attempts), lakukan mitigasi
-    (block + kill session) dan kirim notifikasi.
-    
-    Params:
-    - api: RouterOS API connection
-    - failed_attempts: dict[ip] -> list[timestamp] of recent failures
-    - session_blocked_ips: set of IPs already blocked
-    - notifier: TelegramNotifier instance (opsional, untuk alert)
-    """
     try:
         active_users = api.get_resource('/user/active').get()
 

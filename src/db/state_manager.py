@@ -8,9 +8,6 @@ import datetime
 from config.config import STATE_DB_PATH, MAX_FAILED_ATTEMPTS, STATE_RETENTION_SECONDS
 
 def load_state():
-    """Load persisted state dari JSON file. Return tuple:
-    (failed_attempts, session_blocked_ips, persistent_failed_counts, total_attacks_detected, total_attacks_blocked)
-    """
     if not os.path.exists(STATE_DB_PATH):
         print(f"[*] Database: File belum ada ({STATE_DB_PATH}). Memulai dengan state kosong.")
         return {}, set(), {}, 0, 0
@@ -90,7 +87,6 @@ def load_state():
 
 
 def save_state(failed_attempts, session_blocked_ips, persistent_failed_counts=None, total_attacks_detected=0, total_attacks_blocked=0):
-    """Simpan state ke JSON file untuk persistence across restarts."""
     try:
         if persistent_failed_counts is None:
             persistent_failed_counts = {}

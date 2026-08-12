@@ -7,10 +7,6 @@ from typing import Dict, Any, Optional, List
 
 class DetectorJalurA:
     def __init__(self, whitelist_ips: List[str], max_failed_attempts: int = 5, time_window_seconds: int = 60):
-        """
-        Inisialisasi Detektor Jalur A.
-        failed_attempts diharapkan dikelola sebagai struktur eksternal: dict[ip] -> List[timestamp]
-        """
         self.whitelist_ips = set(whitelist_ips)
         self.max_failed_attempts = max_failed_attempts
         self.time_window_seconds = time_window_seconds
@@ -20,15 +16,6 @@ class DetectorJalurA:
         return [t for t in lst if (now - t) <= self.time_window_seconds]
 
     def analyze_log(self, parsed_log: Dict[str, Any], failed_attempts: Dict[str, List[float]], persistent_failed_counts: Dict[str, dict] = None) -> Optional[Dict[str, Any]]:
-        """
-        Menganalisis satu log terstruktur. Mutates failed_attempts in-place untuk kasus FAILED.
-        Diperbarui: menerima persistent_failed_counts untuk mendukung carry-over across restarts.
-
-        Skema:
-        - Jika IP ada di whitelist -> None
-        - Jika status == 'FAILED' -> append timestamp ke failed_attempts[ip], prune, cek (len(lst) + persistent_count) >= threshold -> reset dan return BRUTE_FORCE
-        - Jika status == 'SUCCESS' -> jika ada histori gagal recent -> return UNAUTHORIZED_SUCCESS threat
-        """
         if not parsed_log:
             return None
 
