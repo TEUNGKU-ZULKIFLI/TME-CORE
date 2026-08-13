@@ -1,119 +1,130 @@
+/* --- Pengaturan Dasar & Tipografi --- */
 body {
-  font-family: system-ui, sans-serif;
-  margin: 0;
-  background: #1e1e2f;   /* abu tua */
-  color: #e0e0e0;        /* teks terang */
-  line-height: 1.6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: #334155; 
+    background-color: #f1f5f9; 
+    margin: 0;
+    padding: 0;
 }
 
+/* --- Layout Responsif --- */
+.container {
+    max-width: 800px; 
+    margin: 40px auto;
+    padding: 40px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-radius: 12px;
+}
+
+/* --- Navigasi Sticky (Fixed saat discroll) --- */
 header {
-  background: #2a2a3d;
-  border-bottom: 1px solid #444;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+    position: sticky;
+    top: 0; /* Menempel di atas */
+    background-color: #ffffff; /* Wajib agar teks di bawahnya tertutup */
+    z-index: 1000;
+    padding: 10px 0 15px 0;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px -4px rgba(0, 0, 0, 0.05); /* Bayangan lembut */
 }
 
 nav {
-  max-width: 960px;
-  margin: auto;
-  display: flex;
-  gap: 1rem;
-  padding: 0.8rem;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center; /* Posisi badge di tengah */
 }
 
-nav a {
-  text-decoration: none;
-  color: #e0e0e0;
-  font-weight: 500;
-}
-
-nav a:hover {
-  color: #4da6ff;
-}
-
-main {
-  max-width: 960px;
-  margin: auto;
-  padding: 1rem;
-}
-
+/* Mengatasi masalah konten yang tertutup header saat link navigasi diklik */
 section {
-  margin: 2rem 0;
+    scroll-margin-top: 80px; 
 }
 
-/* Heading ala GitHub */
+/* --- Gaya Khusus Footer --- */
+footer.container {
+    margin-top: -20px; /* Mendekatkan jarak dengan kotak utama */
+    margin-bottom: 40px;
+    padding: 20px;
+    text-align: center;
+    font-size: 0.9em;
+    color: #64748b;
+}
+
+/* --- Tampilan Mobile (HP) --- */
+@media (max-width: 768px) {
+    .container {
+        margin: 0;
+        border-radius: 0;
+        padding: 20px;
+        box-shadow: none;
+    }
+    header {
+        top: 0;
+    }
+    footer.container {
+        margin-top: 10px;
+    }
+}
+
+/* --- Tipografi & Tautan Markdown --- */
 h1, h2, h3, h4 {
-  font-weight: 600;
-  margin-top: 1.5rem;
-  margin-bottom: 0.8rem;
-}
-h2 {
-  border-bottom: 1px solid #444;
-  padding-bottom: 0.3rem;
-  color: #fff;
-}
-h3 {
-  color: #cfcfcf;
+    color: #0f172a;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
 }
 
-/* List ala GitHub */
-ul, ol {
-  padding-left: 1.5rem;
-}
-li {
-  margin: 0.3rem 0;
+a {
+    color: #2563eb;
+    text-decoration: none;
 }
 
-/* Code block ala GitHub */
+a:hover {
+    text-decoration: underline;
+}
+
+hr {
+    display: none; /* Disembunyikan karena header sudah punya border bawah */
+}
+
+/* --- Gaya untuk Konten Markdown & Kode --- */
 pre {
-  background: #2a2a3d;
-  padding: 0.8rem;
-  border-radius: 6px;
-  overflow-x: auto;
-  border: 1px solid #444;
+    background-color: #1e293b;
+    color: #f8fafc;
+    padding: 15px;
+    border-radius: 6px;
+    overflow-x: auto; 
 }
+
 code {
-  font-family: Consolas, monospace;
-  color: #ffcc66;
+    background-color: #f1f5f9;
+    color: #db2777;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
 }
 
-/* Table ala GitHub */
-table {
-  border-collapse: collapse;
-  margin: 1rem 0;
-  width: 100%;
-}
-th, td {
-  border: 1px solid #444;
-  padding: 0.5rem 0.8rem;
-}
-th {
-  background: #333;
-  color: #fff;
+pre code {
+    background-color: transparent;
+    color: inherit;
+    padding: 0;
 }
 
-/* Asciinema player lebih compact */
-.cast-player {
-  margin: 1rem 0;
-  padding: 0.5rem;
-  background: #2a2a3d;
-  border: 1px solid #444;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
-  max-width: 800px;   /* kecilin frame */
-}
-.cast-player iframe,
-.cast-player .asciinema-player {
-  width: 100%;
-  height: 400px;      /* tinggi lebih kecil */
+blockquote {
+    border-left: 4px solid #3b82f6;
+    margin: 0;
+    padding-left: 15px;
+    color: #475569;
+    background-color: #eff6ff;
+    padding: 10px 15px;
+    border-radius: 0 6px 6px 0;
 }
 
-footer {
-  text-align: center;
-  padding: 1rem;
-  font-size: 0.9rem;
-  color: #aaa;
-  background: #2a2a3d;
-  border-top: 1px solid #444;
+/* --- Asciinema Player --- */
+.cast-player, asciinema-player {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    overflow: hidden;
 }

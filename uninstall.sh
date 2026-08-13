@@ -22,11 +22,13 @@ sudo systemctl disable tmecore.service &&
 sudo rm -rf /etc/systemd/system/tmecore.service &&
 # Memuat Ulang SystemD
 sudo systemctl daemon-reload &&
+sudo systemctl daemon-reload &&
+sudo systemctl daemon-reload &&
 # Validasi Engine Service
 sudo systemctl status tmecore.service &&
 # Vacum log
 sudo journalctl --unit=tmecore.service --vacuum-time=1s
-
+clear
 echo "████████╗███╗   ███╗███████╗     ██████╗ ██████╗ ██████╗ ███████╗"
 echo "╚══██╔══╝████╗ ████║██╔════╝    ██╔════╝██╔═══██╗██╔══██╗██╔════╝"
 echo "   ██║   ██╔████╔██║█████╗█████╗██║     ██║   ██║██████╔╝█████╗  "

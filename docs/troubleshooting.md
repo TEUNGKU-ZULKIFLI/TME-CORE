@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="https://img.shields.io/badge/🔧_TROUBLESHOOTING_with-TME--CORE-orange?style=for-the-bad" />
+  <img src="https://img.shields.io/badge/🔧_TROUBLESHOOTING_with-TME--CORE-orange?style=for-the-badge" />
 </h1>
 
 Dokumen ini merangkum daftar masalah umum yang sering dihadapi oleh administrator jaringan saat mengintegrasikan TME-CORE dengan MikroTik beserta solusinya.
