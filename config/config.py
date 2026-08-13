@@ -29,23 +29,23 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 
 # 4. Parameter Threshold
-MAX_FAILED_ATTEMPTS = 10
+MAX_FAILED_ATTEMPTS = 5 # Disesuaikan dengan pengujian standar
 BLOCK_TIMEOUT = "24h"
 ADDRESS_LIST_NAME = "brute_force_block"
 MAX_CPU_USAGE = 80
 MAX_RAM_USAGE = 90
 
+# 5. Konfigurasi Path dan Direktori
 DATA_DIR = os.path.join(BASE_DIR, "data")
-STATE_RETENTION_SECONDS = int(os.getenv("STATE_RETENTION_SECONDS", 3600))  # retention for persisted failure counts (seconds)
+STATE_RETENTION_SECONDS = int(os.getenv("STATE_RETENTION_SECONDS", 3600))
 DB_DIR = os.path.join(DATA_DIR, "db")
 LOGS_DIR = os.path.join(DATA_DIR, "logs")
 METRICS_DIR = os.path.join(DATA_DIR, "metrics")
 SAMPLES_DIR = os.path.join(DATA_DIR, "samples")
 
-# Otomatis membuat semua folder jika belum ada
+# Otomatis membuat semua folder jika belum ada (Lebih aman dari race condition)
 for directory in [DATA_DIR, DB_DIR, LOGS_DIR, METRICS_DIR, SAMPLES_DIR]:
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    os.makedirs(directory, exist_ok=True)
 
 # Output Paths File Spesifik
 SYSTEM_LOG_PATH = os.path.join(LOGS_DIR, "tmecore_system.log")

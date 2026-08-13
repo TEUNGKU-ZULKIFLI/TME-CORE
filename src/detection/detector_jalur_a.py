@@ -1,6 +1,6 @@
 # ==========================================
 # FILE: src/detection/detector_jalur_a.py
-# FUNGSI: Jalur A - Mendeteksi log Brute Force (menggunakan failed_attempts eksternal)
+# FUNGSI: Jalur A - Detektor Akses Ilegal (1x Tembus) & Brute Force
 # ==========================================
 import time
 from typing import Dict, Any, Optional, List
@@ -12,10 +12,11 @@ class DetectorJalurA:
         self.time_window_seconds = time_window_seconds
 
     def _prune(self, lst: List[float]) -> List[float]:
+        """Menghapus timestamp percobaan yang sudah di luar jendela waktu (time_window)."""
         now = time.time()
         return [t for t in lst if (now - t) <= self.time_window_seconds]
 
-    def analyze_log(self, parsed_log: Dict[str, Any], failed_attempts: Dict[str, List[float]], persistent_failed_counts: Dict[str, dict] = None) -> Optional[Dict[str, Any]]:
+    def analyze_log(self, parsed_log: Dict[str, Any], failed_attempts: Dict[str, List[float]] = None, persistent_failed_counts: Dict[str, dict] = None) -> Optional[Dict[str, Any]]:
         if not parsed_log:
             return None
 
@@ -27,15 +28,16 @@ class DetectorJalurA:
         if not ip:
             return None
 
-        # Abaikan whitelist
+        # 1. Abaikan IP Whitelist (IP resmi pengelola router)
         if ip in self.whitelist_ips:
             return None
 
-        # Ensure persistent_failed_counts shape
+        if failed_attempts is None:
+            failed_attempts = {}
         if persistent_failed_counts is None:
             persistent_failed_counts = {}
 
-        # SUCCESS case: jika ada histori gagal recent => UNAUTHORIZED_SUCCESS
+        # 2. KASUS LOGIN SUKSES dari IP Non-Whitelist -> AKSES ILEGAL (1x TEMBUS / UNAUTHORIZED SUCCESS)
         if status == 'SUCCESS':
             hist = failed_attempts.get(ip, [])
             if not isinstance(hist, list):
@@ -47,20 +49,24 @@ class DetectorJalurA:
             persistent_count = int(persistent_entry.get('count', 0)) if isinstance(persistent_entry.get('count', 0), int) else 0
 
             total_recent = len(hist) + persistent_count
+            
+            # Formulasi pesan deteksi yang informatif
             if total_recent > 0:
-                # leave cleanup to caller after mitigation, but return threat
-                return {
-                    'threat_type': 'UNAUTHORIZED_SUCCESS',
-                    'severity': 'CRITICAL',
-                    'ip': ip,
-                    'service': service,
-                    'username': username,
-                    'message': f"🚨 CRITICAL ALERT: IP {ip} berhasil login via {service} setelah {total_recent} kegagalan!",
-                    'failed_count': total_recent
-                }
-            return None
+                msg = f"🚨 CRITICAL ALERT: IP Asing {ip} berhasil login via {service} sebagai user '{username}' setelah {total_recent}x kegagalan!"
+            else:
+                msg = f"🚨 CRITICAL ALERT: Akses Ilegal Terdeteksi! IP Asing {ip} berhasil login via {service} sebagai user '{username}'!"
 
-        # FAILED case: tambahkan timestamp dan periksa ambang
+            return {
+                'threat_type': 'UNAUTHORIZED_SUCCESS',
+                'severity': 'CRITICAL',
+                'ip': ip,
+                'service': service,
+                'username': username,
+                'message': msg,
+                'failed_count': total_recent
+            }
+
+        # 3. KASUS LOGIN GAGAL dari IP Non-Whitelist -> PERCOBAAN BRUTE FORCE
         if status == 'FAILED':
             now = time.time()
             lst = failed_attempts.get(ip, [])
@@ -75,10 +81,10 @@ class DetectorJalurA:
 
             total_recent = len(lst) + persistent_count
 
+            # Jika jumlah kegagalan mencapai batas threshold -> Pemicu Brute Force Threat
             if total_recent >= self.max_failed_attempts:
-                # reset history agar tidak memicu berulang
+                # Reset histori agar tidak triger berulang-ulang
                 failed_attempts[ip] = []
-                # also reset persistent counter (caller should persist save_state after mitigation)
                 persistent_failed_counts[ip] = {'count': 0, 'last': 0}
                 return {
                     'threat_type': 'BRUTE_FORCE',
@@ -92,3 +98,35 @@ class DetectorJalurA:
                 }
 
         return None
+
+
+# --- Blok Testing Mandiri ---
+if __name__ == "__main__":
+    print("=== TESTING MODUL DETECTOR JALUR A ===")
+    whitelist = ['192.168.10.2', '127.0.0.1']
+    detector = DetectorJalurA(whitelist_ips=whitelist, max_failed_attempts=3)
+    
+    failed_attempts_db = {}
+    persistent_counts_db = {}
+
+    # Tes 1: Whitelist login (Harus Diabaikan)
+    log_wl = {'ip': '192.168.10.2', 'status': 'SUCCESS', 'service': 'api', 'username': 'admin'}
+    print("\n[*] Testing Whitelist Login:")
+    print(f"    Result: {detector.analyze_log(log_wl, failed_attempts_db, persistent_counts_db)}")
+
+    # Tes 2: IP Asing Login Langsung Sukses (1x Tembus)
+    log_tembus = {'ip': '192.168.20.50', 'status': 'SUCCESS', 'service': 'ssh', 'username': 'admin'}
+    print("\n[*] Testing 1x Tembus langsung (IP Asing):")
+    threat1 = detector.analyze_log(log_tembus, failed_attempts_db, persistent_counts_db)
+    if threat1:
+        print(f"    [✓] DETECTED: {threat1['threat_type']} -> {threat1['message']}")
+
+    # Tes 3: Simulasi Brute Force 3x percobaan (Threshold = 3)
+    log_fail = {'ip': '192.168.20.99', 'status': 'FAILED', 'service': 'ssh', 'username': 'admin'}
+    print("\n[*] Testing Brute Force Simulation (IP: 192.168.20.99):")
+    for i in range(1, 4):
+        threat = detector.analyze_log(log_fail, failed_attempts_db, persistent_counts_db)
+        if threat:
+            print(f"    [✓] Attempt #{i}: DETECTED! {threat['threat_type']} -> {threat['message']}")
+        else:
+            print(f"    [-] Attempt #{i}: Recorded failed attempt.")

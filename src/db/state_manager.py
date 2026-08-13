@@ -8,8 +8,11 @@ import datetime
 from config.config import STATE_DB_PATH, MAX_FAILED_ATTEMPTS, STATE_RETENTION_SECONDS
 
 def load_state():
+    """
+    Membaca database state JSON dari disk dan merestore ingatan sistem.
+    """
     if not os.path.exists(STATE_DB_PATH):
-        print(f"[*] Database: File belum ada ({STATE_DB_PATH}). Memulai dengan state kosong.")
+        print(f"[*] Database: File belum ditemukan ({STATE_DB_PATH}). Memulai dengan state baru.")
         return {}, set(), {}, 0, 0
 
     try:
@@ -18,23 +21,19 @@ def load_state():
 
         raw_failed = data.get("failed_attempts", {})
 
-        # Normalize failed_attempts values to list of timestamps (backwards-compatible)
+        # Normalisasi failed_attempts ke format list of timestamps
         failed_attempts = {}
         for k, v in raw_failed.items():
             if isinstance(v, list):
                 failed_attempts[k] = v
-            elif isinstance(v, int):
-                # legacy storage as counts -> convert to empty list (cannot reconstruct timestamps)
-                failed_attempts[k] = []
             else:
                 failed_attempts[k] = []
 
         blocked_ips_list = data.get("session_blocked_ips", [])
         session_blocked_ips = set(blocked_ips_list)
 
-        # Persistent counts (carry-over between restarts)
+        # Persistent counts (bertahan meskipun service direstart)
         persistent_failed_counts = data.get("persistent_failed_counts", {})
-        # normalize: ensure dict[ip] = {'count': int, 'last': float}
         normalized_pfc = {}
         for ip, entry in persistent_failed_counts.items():
             if isinstance(entry, dict):
@@ -49,35 +48,20 @@ def load_state():
         total_attacks_detected = data.get("total_attacks_detected", 0)
         total_attacks_blocked = data.get("total_attacks_blocked", 0)
 
-        # Tampilkan status restore secara jelas
+        # Cetak laporan pemulihan state secara ringkas
         num_failed_ips = len(failed_attempts)
         num_blocked_ips = len(session_blocked_ips)
 
-        print(f"\n[✓] DATABASE RESTORED:")
-        print(f"    ├─ Failed IPs (Recent Attempts): {num_failed_ips}")
-        if num_failed_ips > 0:
-            for ip, hist in sorted(failed_attempts.items()):
-                print(f"    │  └─ {ip}: {len(hist)} attempt(s) dalam time_window")
-        print(f"    ├─ Blocked IPs (Firewall): {num_blocked_ips}")
-        if num_blocked_ips > 0:
-            for ip in sorted(session_blocked_ips):
-                print(f"    │  └─ {ip}")
-
-        # persistent counts info with threshold context
-        if normalized_pfc:
-            print(f"    ├─ Persistent Failure Counts (Threshold={MAX_FAILED_ATTEMPTS}, Retention={STATE_RETENTION_SECONDS}s): {len(normalized_pfc)}")
-            for ip, entry in sorted(normalized_pfc.items()):
-                cnt = entry['count']
-                status = "⚠️ NEAR THRESHOLD" if cnt >= (MAX_FAILED_ATTEMPTS - 2) else "OK"
-                print(f"    │  └─ {ip}: {cnt}/{MAX_FAILED_ATTEMPTS} {status}")
-
-        print(f"    ├─ Total Detected Attacks: {total_attacks_detected}")
-        print(f"    └─ Total Blocked Attacks: {total_attacks_blocked}\n")
+        print(f"\n[✓] DATABASE RESTORED ({STATE_DB_PATH}):")
+        print(f"    ├─ IP Percobaan Login Gagal : {num_failed_ips}")
+        print(f"    ├─ IP Terblokir di Firewall : {num_blocked_ips}")
+        print(f"    ├─ Total Serangan Terdeteksi: {total_attacks_detected}")
+        print(f"    └─ Total Serangan Terblokir : {total_attacks_blocked}\n")
 
         return failed_attempts, session_blocked_ips, normalized_pfc, total_attacks_detected, total_attacks_blocked
 
     except json.JSONDecodeError as e:
-        print(f"[-] DATABASE ERROR: File JSON corrupt ({STATE_DB_PATH}) -> {e}")
+        print(f"[-] DATABASE ERROR: File JSON korup ({STATE_DB_PATH}) -> {e}")
         print(f"[!] Memulai dengan state kosong.\n")
         return {}, set(), {}, 0, 0
     except Exception as e:
@@ -87,6 +71,9 @@ def load_state():
 
 
 def save_state(failed_attempts, session_blocked_ips, persistent_failed_counts=None, total_attacks_detected=0, total_attacks_blocked=0):
+    """
+    Menyimpan state terkini ke dalam berkas JSON secara sinkron.
+    """
     try:
         if persistent_failed_counts is None:
             persistent_failed_counts = {}
@@ -104,3 +91,20 @@ def save_state(failed_attempts, session_blocked_ips, persistent_failed_counts=No
             json.dump(data, f, indent=4, ensure_ascii=False)
     except Exception as e:
         print(f"[-] DATABASE ERROR: Gagal menyimpan state -> {e}")
+
+
+# --- Blok Testing Mandiri ---
+if __name__ == "__main__":
+    print("=== TESTING MODUL STATE MANAGER ===")
+    
+    # 1. Tes Simpan State Dummy
+    dummy_failed = {"192.168.20.99": [1700000000.0]}
+    dummy_blocked = {"192.168.20.99"}
+    dummy_pfc = {"192.168.20.99": {'count': 3, 'last': 1700000000.0}}
+    
+    print("[*] Menyimpan state uji coba...")
+    save_state(dummy_failed, dummy_blocked, dummy_pfc, total_attacks_detected=1, total_attacks_blocked=1)
+    
+    # 2. Tes Membaca State kembali
+    print("[*] Membaca state dari disk...")
+    load_state()
