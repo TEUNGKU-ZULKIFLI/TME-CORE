@@ -58,7 +58,7 @@ if __name__ == "__main__":
     if api_conn:
         print("[!] TME-CORE REAL TIME AKTIF: Memonitor Beban Router (Tekan Ctrl+C untuk berhenti)...")
         try:
-            for _ in range(3): # Cek 3 kali dalam pengujian mandiri
+            for _ in range(60): # Cek 60 kali dalam pengujian mandiri
                 check_router_load(api_conn)
                 time.sleep(2)
         except KeyboardInterrupt:

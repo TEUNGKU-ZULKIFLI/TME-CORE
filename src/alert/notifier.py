@@ -1,10 +1,5 @@
-# ==========================================
-# FILE: src/alert/notifier.py
-# FUNGSI: Mengirim Notifikasi ke Telegram dengan Template Terpadu
-# ==========================================
 import requests
 import datetime
-import os
 from typing import Dict, Any, Optional
 
 class TelegramNotifier:
@@ -21,28 +16,23 @@ class TelegramNotifier:
         service = threat_data.get('service', 'N/A')
         username = threat_data.get('username', 'N/A')
 
-        # Map threat type ke emoji
         threat_emoji = {
             'BRUTE_FORCE': '🔓',
             'UNAUTHORIZED_SUCCESS': '🚨',
             'BYPASS_BLOCKED': '🔥'
         }.get(threat_type, '⚠️')
 
-        # Status action
         action_status = "BLOCKED & BLACKLISTED"
         if threat_type == 'UNAUTHORIZED_SUCCESS':
             action_status = "BLOCKED & SESSION KICKED"
         elif threat_type == 'BYPASS_BLOCKED':
             action_status = "SECONDARY BLOCK (Anomaly Detected)"
 
-        # Severity emoji
         sev_emoji = {'CRITICAL': '🔴', 'HIGH': '🟠', 'MEDIUM': '🟡'}.get(severity, '⚪')
 
-        # Build message
         msg = (
             f"{threat_emoji} *TME-CORE SECURITY ALERT* {sev_emoji}\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
             f"*Threat Type:* `{threat_type}`\n"
             f"*Severity:* {sev_emoji} {severity}\n"
             f"*Attacker IP:* `{ip}`\n"
@@ -71,7 +61,6 @@ class TelegramNotifier:
 
     def send_alert(self, threat_data: Dict[str, Any], cpu: Optional[int] = None,
                   ram_mb: Optional[float] = None, failed_count: Optional[int] = None) -> bool:
-
         if not self.token or not self.chat_id:
             print("[-] Telegram Token atau Chat ID belum dikonfigurasi.")
             return False
@@ -99,6 +88,7 @@ class TelegramNotifier:
         if not self.token or not self.chat_id:
             print("[-] Telegram Token atau Chat ID belum dikonfigurasi.")
             return False
+            
         try:
             payload = {'chat_id': self.chat_id, 'text': text, 'parse_mode': parse_mode}
             response = requests.post(self.api_url, json=payload, timeout=5)
@@ -111,23 +101,3 @@ class TelegramNotifier:
         except Exception as e:
             print(f"[✗] Error koneksi Telegram (raw): {e}")
             return False
-
-
-# --- Blok Testing Mandiri ---
-if __name__ == "__main__":
-    print("=== TESTING MODUL TELEGRAM NOTIFIER ===")
-    dummy_threat = {
-        'ip': '203.0.113.42',
-        'threat_type': 'UNAUTHORIZED_SUCCESS',
-        'severity': 'CRITICAL',
-        'service': 'winbox',
-        'username': 'admin'
-    }
-    
-    # Kita hanya mencetak template untuk mengecek kerapian format
-    tester = TelegramNotifier("DUMMY_TOKEN", "DUMMY_CHAT_ID")
-    formatted_msg = tester.format_threat_alert(dummy_threat, cpu=45, ram_mb=128.5, failed_count=1)
-    
-    print("\n[Preview Pesan Telegram]:\n")
-    print(formatted_msg)
-    print("\n[!] Pesan tidak dikirim karena menggunakan DUMMY_TOKEN.")
