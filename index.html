@@ -8,7 +8,8 @@
   <script src="assets/js/marked.min.js"></script>
 </head>
 <body>
-  <header>
+  <div class="container">
+    <header>
     <nav>
 	<a href="#install">
 	  <img src="https://img.shields.io/badge/📥-Install-green?style=for-the-badge" />
@@ -27,6 +28,7 @@
         </a>
     </nav>
   </header>
+  <hr>
 
   <main>
     <section id="readme">
@@ -67,11 +69,10 @@
     </section>
 
   </main>
-
-  <footer>
+  </div>
+  <footer class="container">
     © 2026 TME-CORE Documentation
   </footer>
-
 <script src="assets/js/asciinema-player.min.js"></script>
 <script>
   // Render README.md
@@ -107,6 +108,10 @@
       const main_engine = document.getElementById('main_engine');
       if (main_engine) {
         AsciinemaPlayer.create('assets/casts/main_engine.cast', main_engine);
+      }
+      const systmed_daemon = document.getElementById('systemd_daemon');
+      if (systemd_daemon) {
+        AsciinemaPlayer.create('assets/casts/systemd_daemon.cast', systemd_daemon);
       }
     });
 

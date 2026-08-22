@@ -1,61 +1,103 @@
-# ==========================================
-# FILE: src/alert/notifier.py
-# FUNGSI: Mengirim Notifikasi ke Telegram
-# ==========================================
 import requests
-from config import config
+import datetime
+from typing import Dict, Any, Optional
 
-def send_telegram_alert(ip_attacker, cpu_load, sisa_ram, custom_message=None):
-    """
-    Mengirimkan pesan peringatan mitigasi otomatis dengan visualisasi
-    yang kontras dan terstruktur menggunakan parsing HTML.
-    Mendukung pengiriman pesan kustom untuk anomali Jalur B.
-    """
-    if not config.TELEGRAM_TOKEN or not config.TELEGRAM_CHAT_ID:
-        print("[-] NOTIFIKASI: Token Telegram atau Chat ID belum dikonfigurasi.")
-        return False
+class TelegramNotifier:
+    def __init__(self, token: str, chat_id: str):
+        self.token = token
+        self.chat_id = chat_id
+        self.api_url = f"https://api.telegram.org/bot{self.token}/sendMessage"
 
-    # Jika ada pesan kustom (seperti alert anomali Jalur B), langsung gunakan pesan tersebut
-    if custom_message:
-        pesan = custom_message
-    else:
-        # Desain visualisasi indikator beban CPU menggunakan Emoji Meter
-        cpu_bar = "🟢"
-        if cpu_load >= 80:
-            cpu_bar = "🔴 (CRITICAL)"
-        elif cpu_load >= 50:
-            cpu_bar = "🟡 (WARNING)"
+    def format_threat_alert(self, threat_data: Dict[str, Any], cpu: Optional[int] = None,
+                          ram_mb: Optional[float] = None, failed_count: Optional[int] = None) -> str:
+        ip = threat_data.get('ip', 'N/A')
+        threat_type = threat_data.get('threat_type', 'UNKNOWN')
+        severity = threat_data.get('severity', 'MEDIUM')
+        service = threat_data.get('service', 'N/A')
+        username = threat_data.get('username', 'N/A')
 
-        # Format Pesan HTML yang Estetis (Default)
-        pesan = (
-            f"<b>🛡️ TME-CORE SYSTEM ALERT</b>\n"
-            f"<i>Automated Intrusion Prevention Active</i>\n"
-            f"───────────────────────────\n\n"
-            f"🚨 <b>SERANGAN BRUTE FORCE DIBLOKIR!</b>\n"
-            f"📌 <b>IP Penyerang :</b> <code>{ip_attacker}</code>\n"
-            f"⚡ <b>Status Aksi   :</b> <code>DROP (Blacklisted)</code>\n\n"
-            f"📊 <b>METRIK SUMBER DAYA ROUTER:</b>\n"
-            f"  ├─ Beban CPU : {cpu_load}% {cpu_bar}\n"
-            f"  └─ Sisa RAM  : {sisa_ram:.2f} MB / 32.00 MB\n\n"
-            f"───────────────────────────\n"
-            f"📅 <i>Dilaporkan secara real-time oleh TME Engine</i>"
+        threat_emoji = {
+            'BRUTE_FORCE': '🔓',
+            'UNAUTHORIZED_SUCCESS': '🚨',
+            'BYPASS_BLOCKED': '🔥'
+        }.get(threat_type, '⚠️')
+
+        action_status = "BLOCKED & BLACKLISTED"
+        if threat_type == 'UNAUTHORIZED_SUCCESS':
+            action_status = "BLOCKED & SESSION KICKED"
+        elif threat_type == 'BYPASS_BLOCKED':
+            action_status = "SECONDARY BLOCK (Anomaly Detected)"
+
+        sev_emoji = {'CRITICAL': '🔴', 'HIGH': '🟠', 'MEDIUM': '🟡'}.get(severity, '⚪')
+
+        msg = (
+            f"{threat_emoji} *TME-CORE SECURITY ALERT* {sev_emoji}\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+            f"*Threat Type:* `{threat_type}`\n"
+            f"*Severity:* {sev_emoji} {severity}\n"
+            f"*Attacker IP:* `{ip}`\n"
+            f"*Service:* `{service}`\n"
+            f"*Target User:* `{username}`\n"
         )
 
-    url = f"https://api.telegram.org/bot{config.TELEGRAM_TOKEN}/sendMessage"
-    payload = {
-        "chat_id": config.TELEGRAM_CHAT_ID,
-        "text": pesan,
-        "parse_mode": "HTML"
-    }
+        if failed_count is not None and failed_count > 0:
+            msg += f"*Failed Attempts:* {failed_count}x dalam batas waktu\n"
 
-    try:
-        response = requests.post(url, data=payload, timeout=5)
-        if response.status_code == 200:
-            print("[+] NOTIFIKASI: Pesan peringatan berhasil dikirim ke Telegram!")
-            return True
-        else:
-            print(f"[-] GAGAL NOTIFIKASI: Telegram API Return -> {response.text}")
+        msg += f"*Action:* {action_status}\n"
+
+        if cpu is not None or ram_mb is not None:
+            msg += f"\n*System Load (saat mitigasi):*\n"
+            if cpu is not None:
+                cpu_status = "🔴 CRITICAL" if cpu >= 80 else "🟡 WARNING" if cpu >= 50 else "🟢 NORMAL"
+                msg += f"  • CPU: {cpu}% {cpu_status}\n"
+            if ram_mb is not None:
+                msg += f"  • Free RAM: {ram_mb:.1f} MB\n"
+
+        msg += f"\n━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        msg += f"🕐 {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+        msg += f"🛡️ _TME-CORE Autonomous Mitigation Engine_"
+
+        return msg
+
+    def send_alert(self, threat_data: Dict[str, Any], cpu: Optional[int] = None,
+                  ram_mb: Optional[float] = None, failed_count: Optional[int] = None) -> bool:
+        if not self.token or not self.chat_id:
+            print("[-] Telegram Token atau Chat ID belum dikonfigurasi.")
             return False
-    except Exception as e:
-        print(f"[-] GAGAL NOTIFIKASI: Masalah koneksi jaringan ke API Telegram -> {e}")
-        return False
+
+        message = self.format_threat_alert(threat_data, cpu=cpu, ram_mb=ram_mb, failed_count=failed_count)
+
+        try:
+            payload = {
+                'chat_id': self.chat_id,
+                'text': message,
+                'parse_mode': 'Markdown'
+            }
+            response = requests.post(self.api_url, json=payload, timeout=5)
+            if response.status_code == 200:
+                print(f"[✓] Notifikasi Telegram berhasil dikirim!")
+                return True
+            else:
+                print(f"[✗] Gagal mengirim Telegram ({response.status_code}): {response.text}")
+                return False
+        except Exception as e:
+            print(f"[✗] Error saat koneksi ke API Telegram: {e}")
+            return False
+
+    def send_raw_message(self, text: str, parse_mode: str = 'Markdown') -> bool:
+        if not self.token or not self.chat_id:
+            print("[-] Telegram Token atau Chat ID belum dikonfigurasi.")
+            return False
+            
+        try:
+            payload = {'chat_id': self.chat_id, 'text': text, 'parse_mode': parse_mode}
+            response = requests.post(self.api_url, json=payload, timeout=5)
+            if response.status_code == 200:
+                print(f"[✓] Pesan Telegram (raw) berhasil dikirim")
+                return True
+            else:
+                print(f"[✗] Gagal mengirim Telegram (raw) ({response.status_code}): {response.text}")
+                return False
+        except Exception as e:
+            print(f"[✗] Error koneksi Telegram (raw): {e}")
+            return False

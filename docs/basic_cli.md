@@ -1,74 +1,66 @@
 <h1 align="center">
-  <img src="https://img.shields.io/badge/⌨️_BASIC_CLI_with-TME--CORE-8A2BE2?style=for-the-bad" />
+  <img src="https://img.shields.io/badge/⌨️_BASIC_CLI_with-TME--CORE-8A2BE2?style=for-the-badge" />
 </h1>
 
-## **Check Status Engine**
-**Pastikan sudah menyetup Systemd:**</br>
-<a href="./getting_started.md#%EF%B8%8F-5-menjalankan-sebagai-layanan-247-systemd">
-  <img src="https://img.shields.io/badge/⚙️-ENGINE-orange?style=for-the-badge" />
-</a></br>
+Dokumen ini berisi daftar contekan (*cheat sheet*) perintah dasar untuk mengelola layanan TME-CORE dan menjalankan modul-modul pengujian internal.
 
-### **Status Engine**
-**`Checking Service Engine`**
+## ⚙️ Manajemen Layanan (Systemd)
+Pastikan Anda telah melakukan pengaturan Systemd sesuai panduan [Getting Started (Skenario B)](getting_started.md#skenario-b-menjalankan-sebagai-layanan-latar-belakang-systemd) sebelum menggunakan perintah di bawah ini.
+
+### Memeriksa Status Mesin (Status)
+Untuk melihat apakah layanan TME-CORE sedang berjalan dan melihat log terbaru:
 ```bash
 sudo systemctl status tmecore.service
 ```
 
-### **Hidupkan Engine**
-**`Starting Service Engine`**
+### Menghidupkan Mesin (Start)
+Untuk memulai layanan pemantauan:
 ```bash
 sudo systemctl start tmecore.service
 ```
 
-### **Hentikan Engine**
-**`Stop it Service Engine`**
+### Menghentikan Mesin (Stop)
+Untuk mematikan sementara layanan pemantauan:
 ```bash
 sudo systemctl stop tmecore.service
 ```
 
-### **Mulai Ulang Engine**
-**`Restarting Service Engine`**
+### Memulai Ulang Mesin (Restart)
+Sangat berguna jika Anda baru saja melakukan perubahan pada file `.env` atau pembaruan kode:
 ```bash
 sudo systemctl restart tmecore.service
 ```
 
-## **CLI (Command Line Interface) Basic**
-### **Running Engine**
-Aktifkan lingkungan **`Virtual Environment`**
-```bash
-source venv/bin/activate
-```
-**`🔥 STARTING ENGINE`**
+---
+
+## 💻 Perintah Dasar CLI (Eksekusi Manual)
+Gunakan perintah ini saat Anda sedang melakukan *debugging* atau pengetesan (*troubleshooting*) secara manual di terminal. 
+
+> **⚠️ Penting:** Selalu pastikan Anda telah mengaktifkan lingkungan virtual sebelum menjalankan modul Python apa pun:
+> ```bash
+> source venv/bin/activate
+> ```
+
+### 🚀 Menjalankan Mesin Utama (Main Engine)
+Menjalankan mesin deteksi, *parsing* log, dan mitigasi secara *real-time*:
 ```bash
 python3 -m src.main_engine
 ```
 
-### **Test Connection**
-Aktifkan lingkungan **`Virtual Environment`**
-```bash
-source venv/bin/activate
-```
-**`📎 TEST KONEKSI`**
+### 📎 Uji Koneksi API (Test Connection)
+Memverifikasi respons dan kredensial komunikasi port 8728 antara Debian dan MikroTik:
 ```bash
 python3 -m src.api.connection
 ```
 
-### **Test Log Parser**
-Aktifkan lingkungan **`Virtual Environment`**
-```bash
-source venv/bin/activate
-```
-**`📃 TEST LOG PARSER`**
+### 📃 Uji Ekstraksi Log (Test Log Parser)
+Memvalidasi kemampuan *Regex* (Regular Expression) dalam membaca log ancaman dari memori *router*:
 ```bash
 python3 -m src.parser.log_parser
 ```
 
-### **Test Monitoring CPU & RAM**
-Aktifkan lingkungan **`Virtual Environment`**
-```bash
-source venv/bin/activate
-```
-**`👀 TEST MONITOR REALTIME CPU & RAM`**
+### 👀 Pantauan Metrik (Test Monitoring Realtime)
+Membaca beban CPU, memori RAM, dan parameter kesehatan *router* MikroTik secara langsung (menyimulasikan fungsi pengumpulan dataset skripsi):
 ```bash
 python3 -m src.monitoring.realtime_cpu_ram
 ```

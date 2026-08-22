@@ -16,7 +16,7 @@ class Colors:
     RESET = '\033[0m'
 
 def print_banner():
-    """Mencetak ASCII Art yang elegan layaknya tools Hacking/DevOps"""
+    """Mencetak Banner TME-CORE ke layar terminal."""
     os.system('clear' if os.name == 'posix' else 'cls') # Bersihkan layar
 
     banner = f"""{Colors.CYAN}{Colors.BOLD}
@@ -32,13 +32,18 @@ def print_banner():
     print(f"{Colors.YELLOW} [🎓] Politeknik Negeri Lhokseumawe - Teknologi Rekayasa Komputer Jaringan{Colors.RESET}")
     print(f"{Colors.CYAN}{'=' * 65}{Colors.RESET}")
 
-def run_doctor(env_path, data_dir, config_module):
+def run_doctor(env_path=None, data_dir=None, config_module=None):
     """
-    Melakukan Pre-Flight Check
-    sebelum Engine benar-benar berjalan.
+    Menjalankan pemeriksaan kesehatan dasar lingkungan sistem (Pre-flight doctor).
     """
+    if env_path is None or data_dir is None or config_module is None:
+        from config import config as cfg
+        env_path = cfg.ENV_PATH
+        data_dir = cfg.DATA_DIR
+        config_module = cfg
+
     print(f"\n{Colors.BOLD}🔍 Menjalankan TME-CORE Doctor...{Colors.RESET}")
-    time.sleep(0.5)
+    time.sleep(0.3)
 
     all_passed = True
 
@@ -54,27 +59,32 @@ def run_doctor(env_path, data_dir, config_module):
     if os.path.exists(env_path):
         print(f"  [{Colors.GREEN}✓{Colors.RESET}] Environment    : File .env ditemukan")
     else:
-        print(f"  [{Colors.RED}✗{Colors.RESET}] Environment    : File .env HILANG! Gunakan nilai default.")
-        all_passed = False
+        print(f"  [{Colors.YELLOW}!{Colors.RESET}] Environment    : File .env HILANG! Menggunakan konfigurasi default.")
 
     # 3. Cek Folder Data
     if os.path.exists(data_dir):
-        print(f"  [{Colors.GREEN}✓{Colors.RESET}] Data Directory : Folder penyimpanan log siap")
+        print(f"  [{Colors.GREEN}✓{Colors.RESET}] Data Directory : Folder penyimpanan siap ({data_dir})")
     else:
-        print(f"  [{Colors.RED}✗{Colors.RESET}] Data Directory : Gagal membuat folder data/")
+        print(f"  [{Colors.RED}✗{Colors.RESET}] Data Directory : Folder data tidak ditemukan!")
         all_passed = False
 
-    # 4. Cek Telegram (Opsional)
-    if config_module.TELEGRAM_TOKEN and config_module.TELEGRAM_CHAT_ID:
+    # 4. Cek Telegram
+    if getattr(config_module, 'TELEGRAM_TOKEN', '') and getattr(config_module, 'TELEGRAM_CHAT_ID', ''):
          print(f"  [{Colors.GREEN}✓{Colors.RESET}] Notifikasi     : Bot Telegram Terkonfigurasi")
     else:
-         print(f"  [{Colors.YELLOW}!{Colors.RESET}] Notifikasi     : Telegram Token kosong (Berjalan Mode Senyap)")
+         print(f"  [{Colors.YELLOW}!{Colors.RESET}] Notifikasi     : Telegram Token belum diset (Mode Senyap)")
 
     print(f"{Colors.CYAN}{'-' * 65}{Colors.RESET}")
 
     if not all_passed:
-        print(f"{Colors.YELLOW}[!] Doctor mendeteksi beberapa isu, namun Engine akan tetap mencoba berjalan...{Colors.RESET}\n")
+        print(f"{Colors.YELLOW}[!] Doctor mendeteksi beberapa peringatan, namun Engine tetap dapat dijalankan.{Colors.RESET}\n")
     else:
         print(f"{Colors.GREEN}[✓] Doctor: Semua sistem dalam kondisi PRIMA!{Colors.RESET}\n")
 
-    time.sleep(1)
+    time.sleep(0.5)
+
+
+# --- Blok Testing Mandiri ---
+if __name__ == "__main__":
+    print_banner()
+    run_doctor()

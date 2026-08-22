@@ -1,48 +1,29 @@
-# ==========================================
-# FILE: src/api/connection.py
-# FUNGSI: Jembatan komunikasi ke RouterOS
-# ==========================================
-from config import config
 import routeros_api
-from src.cli.console import print_banner
+from config.config import MIKROTIK_IP, MIKROTIK_USER, MIKROTIK_PASS, MIKROTIK_PORT
 
-def connect_to_mikrotik():
-    """
-    Fungsi ini bertugas membuka jalur API ke MikroTik.
-    Return: object koneksi (api) jika sukses, None jika gagal.
-    """
+def connect_to_mikrotik(quiet=False):
     try:
-        # Inisialisasi parameter koneksi
         connection = routeros_api.RouterOsApiPool(
-            config.MIKROTIK_IP,
-            username=config.MIKROTIK_USER,
-            password=config.MIKROTIK_PASS,
-            port=config.MIKROTIK_PORT,
-            plaintext_login=True
+            MIKROTIK_IP,
+            username=MIKROTIK_USER,
+            password=MIKROTIK_PASS,
+            port=MIKROTIK_PORT,
+            plaintext_login=True,
         )
-
-        # Eksekusi koneksi
         api = connection.get_api()
-        print(f"[+] SUKSES: Terhubung ke MikroTik {config.MIKROTIK_IP}")
+        if not quiet:
+            print(f"[✓] SUKSES: Terhubung ke MikroTik {MIKROTIK_IP}")
         return api, connection
-
     except Exception as e:
-        print(f"[-] GAGAL KONEKSI: Pastikan API MikroTik aktif (/ip services enable api)")
-        print(f"[-] Error Log: {e}")
+        print("[✗] GAGAL KONEKSI: Pastikan API MikroTik aktif (/ip service enable api) dan kredensial benar.")
+        print(f"[✗] Error Log: {e}")
         return None, None
 
-def disconnect_from_mikrotik(connection_pool):
-    """
-    Fungsi untuk menutup koneksi agar CPU MikroTik tidak penuh (Memory Leak)
-    """
+def disconnect_from_mikrotik(connection_pool, quiet=False):
     if connection_pool:
-        connection_pool.disconnect()
-        print("[*] Koneksi ke MikroTik ditutup dengan aman.")
-
-# --- Blok Testing (Hanya jalan jika file ini dieksekusi langsung) ---
-if __name__ == "__main__":
-    print_banner()
-    print("Mencoba koneksi ke MikroTik...")
-    api_conn, pool = connect_to_mikrotik()
-    if api_conn:
-        disconnect_from_mikrotik(pool)
+        try:
+            connection_pool.disconnect()
+        except Exception:
+            pass
+        if not quiet:
+            print("[*] Koneksi ke MikroTik ditutup dengan aman.")
