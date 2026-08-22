@@ -46,5 +46,5 @@ def fetch_and_parse_logs(api_connection) -> List[Dict[str, Any]]:
                 parsed_results.append(parsed_data)
     except Exception as e:
         print(f"[✗] Error saat mengambil log dari API: {e}")
-
+        
     return parsed_results
