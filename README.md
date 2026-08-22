@@ -24,7 +24,7 @@ TME-CORE memecahkan masalah ini dengan memindahkan beban kerja komputasi analiti
 - **Jalur B (Active Session Guard - Zero Trust):** Mengawasi anomali akses. Jika entitas di luar *whitelist* berhasil masuk (*login success*), sistem langsung memutus sesi aktif menggunakan mekanisme *3-Tier Fallback Session Kick* (API `request-logout` &rarr; API `remove` &rarr; Firewall Connection Teardown) dan mengisolasi IP-nya seketika.
 
 ## 🗺️ Arsitektur Aliran Data
-<img src="assets/images/ArsitekturAliranData.png" align="center" width="800" />
+<img src="assets/images/FlowchartSistem03.png" align="center" width="800" />
 
 ## 🚀 Bagaimana Saya Memulainya?
 Ikuti panduan langkah demi langkah di bawah ini untuk memasang dan menjalankan TME-CORE di lingkungan laboratorium atau jaringan produksi Anda.
